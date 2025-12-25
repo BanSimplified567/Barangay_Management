@@ -1,0 +1,7 @@
+<?php
+// app/controllers/Auth/LogoutController.php
+
+
+session_destroy();
+header("Location: index.php?action=login");
+exit();
