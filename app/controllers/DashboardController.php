@@ -7,23 +7,33 @@ if (!isset($pdo)) {
 }
 
 try {
-    // Dashboard statistics
-    $total_residents = $pdo->query("SELECT COUNT(*) FROM residents")->fetchColumn();
-    $total_officials = $pdo->query("SELECT COUNT(*) FROM tbl_officials")->fetchColumn();
+// app/controllers/DashboardController.php
 
-    $certificates_issued = $pdo->query("SELECT COUNT(*) FROM tbl_certifications WHERE status = 'issued'")->fetchColumn();
+require_once '../config/dbcon.php'; // Make sure $pdo is available
 
-    $ongoing_events = $pdo->query("SELECT COUNT(*) FROM tbl_events WHERE status = 'ongoing'")->fetchColumn();
+// Count total residents
+$stmt = $pdo->query("SELECT COUNT(*) FROM tbl_residents");
+$total_residents = $stmt->fetchColumn();
 
-    $upcoming_events = $pdo->query("SELECT COUNT(*) FROM tbl_events WHERE status = 'upcoming'")->fetchColumn();
+// Count pending certifications
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_certifications WHERE status = 'pending'");
+$stmt->execute();
+$pending_certifications = $stmt->fetchColumn();
 
-    // Recent announcements
-    $stmt = $pdo->query("SELECT title, content, post_date FROM tbl_announcements ORDER BY post_date DESC LIMIT 5");
-    $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Count upcoming events (today and future)
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_events WHERE event_date >= CURDATE() AND status = 'upcoming'");
+$stmt->execute();
+$upcoming_events = $stmt->fetchColumn();
 
-    // Recent activity logs
-    $stmt = $pdo->query("SELECT action, timestamp FROM tbl_logs ORDER BY timestamp DESC LIMIT 5");
-    $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Count open blotters
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_blotters WHERE status = 'open'");
+$stmt->execute();
+$open_blotters = $stmt->fetchColumn();
+
+// Count current officials (optional - assuming term_end is null or future)
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_officials WHERE term_end IS NULL OR term_end >= CURDATE()");
+$stmt->execute();
+$total_officials = $stmt->fetchColumn();
 
 } catch (PDOException $e) {
     // Log error in production, show user-friendly message

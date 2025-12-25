@@ -58,7 +58,8 @@
         <?php if (isset($_GET['error'])): ?>
             <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['error']); ?></div>
         <?php endif; ?>
-<form action="/Barangay_Management/public/index.php?action=login" method="POST">
+<form action="/public/index.php?action=login" method="POST">
+
             <div class="mb-3">
                 <label for="email" class="form-label">Email:</label>
                 <input type="email" class="form-control" id="email" name="email" autocomplete="email" required>
@@ -74,7 +75,7 @@
             </div>
             <button type="submit" class="btn btn-login">Login</button>
         </form>
-        <p class="text-center mt-3">Don't have an account? <a href="./signup.php">Sign Up</a></p>
+        <p class="text-center mt-3">Don't have an account? <a href="index.php?action=register">Sign Up</a></p>
     </div>
 
     <!-- Bootstrap JS -->

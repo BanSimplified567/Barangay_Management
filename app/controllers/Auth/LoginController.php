@@ -24,4 +24,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
-require_once '../app/views/Auth/login.php';
+require_once '../app/views/auth/login.php';

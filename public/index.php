@@ -7,10 +7,18 @@ require_once '../app/middleware/auth.php';         // Authentication middleware
 // Determine the action from URL (e.g., index.php?action=officials)
 $action = $_GET['action'] ?? 'dashboard';
 
+
 switch ($action) {
 
-      case 'login':
+ case 'login':
+        guest_only();
         require_once '../app/controllers/Auth/LoginController.php';
+
+        break;
+
+    case 'register':
+        guest_only();
+        require_once '../app/controllers/Auth/RegisterController.php';
         break;
 
     case 'logout':
