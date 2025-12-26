@@ -118,14 +118,17 @@ CREATE TABLE IF NOT EXISTS `tbl_logs` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `tbl_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `tbl_users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table db_barangaymanagement.tbl_logs: ~4 rows (approximately)
 INSERT INTO `tbl_logs` (`id`, `user_id`, `action`, `timestamp`) VALUES
 	(1, 1, 'Added resident: Jade Ivan banban Bringcola', '2025-12-24 10:27:04'),
 	(2, 1, 'Added resident: Jade Ivan banban Bringcola', '2025-12-24 10:27:04'),
 	(3, 1, 'Added resident: Jade Ivan banban Bringcola', '2025-12-24 10:27:04'),
-	(4, 1, 'Added resident: Banni', '2025-12-24 10:27:43');
+	(4, 1, 'Added resident: Banni', '2025-12-24 10:27:43'),
+	(5, 1, 'User logged in', '2025-12-25 13:20:37'),
+	(6, 3, 'User logged in', '2025-12-25 13:27:38'),
+	(7, 1, 'User logged in', '2025-12-26 03:04:24');
 
 -- Dumping structure for table db_barangaymanagement.tbl_officials
 CREATE TABLE IF NOT EXISTS `tbl_officials` (
@@ -176,11 +179,13 @@ CREATE TABLE IF NOT EXISTS `tbl_users` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table db_barangaymanagement.tbl_users: ~0 rows (approximately)
 INSERT INTO `tbl_users` (`id`, `full_name`, `email`, `password`, `role`, `created_at`) VALUES
-	(1, 'bannie', 'naviedaj567@gmail.com', '$2y$12$x4K49m1uLeyZFFyQIi8R.eAeQxag0oN2GTPtLggf.efsmog6Il4FO', 'admin', '2025-12-24 06:24:31');
+	(1, 'bannie', 'naviedaj567@gmail.com', '$2y$12$x4K49m1uLeyZFFyQIi8R.eAeQxag0oN2GTPtLggf.efsmog6Il4FO', 'admin', '2025-12-24 06:24:31'),
+	(2, 'Bannie', 'ivanjade@gmail.com', '$2y$12$c.Estajla21/v0T1SEPQ3Ooyv9rOVMfH87jT.GQiWQIJYvmNw5bFW', 'resident', '2025-12-25 12:48:58'),
+	(3, 'bani', 'bannie@gmail.com', '$2y$12$c.Estajla21/v0T1SEPQ3Ooyv9rOVMfH87jT.GQiWQIJYvmNw5bFW', 'staff', '2025-12-25 13:26:45');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

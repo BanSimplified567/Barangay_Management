@@ -1,35 +1,63 @@
 <?php
+// app/controllers/residents/delete_resident.php
 session_start();
-include '../config/dbcon.php';
+require_once '../../config/dbcon.php';
 
-if (!isset($_SESSION['email'])) {
-    die('Unauthorized access.');
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    $_SESSION['error'] = 'Unauthorized access.';
+    header("Location: ../../public/index.php?action=login");
+    exit();
 }
 
 // Check user role
-$stmtUser = $pdo->prepare("SELECT role FROM users WHERE email = ?");
-$stmtUser->execute([$_SESSION['email']]);
-$role = $stmtUser->fetchColumn();
-
-if ($role !== 'admin' && $role !== 'staff') {
-    die('Permission denied.');
+$role = $_SESSION['role'] ?? '';
+if (!in_array($role, ['admin', 'staff'])) {
+    $_SESSION['error'] = 'Permission denied.';
+    header("Location: ../../public/index.php?action=dashboard");
+    exit();
 }
 
-if (isset($_GET['id'])) {
-    $id = $_GET['id'];
-    $stmt = $pdo->prepare("DELETE FROM residents WHERE id = ?");
+// Check if ID is provided
+if (!isset($_GET['id'])) {
+    $_SESSION['error'] = 'No resident ID specified.';
+    header("Location: ../../public/index.php?action=residents");
+    exit();
+}
+
+$id = (int)$_GET['id'];
+
+try {
+    // Get resident name for logging
+    $stmt = $pdo->prepare("SELECT full_name FROM tbl_residents WHERE id = ?");
+    $stmt->execute([$id]);
+    $resident = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$resident) {
+        $_SESSION['error'] = 'Resident not found.';
+        header("Location: ../../public/index.php?action=residents");
+        exit();
+    }
+
+    // Delete resident
+    $stmt = $pdo->prepare("DELETE FROM tbl_residents WHERE id = ?");
     $stmt->execute([$id]);
 
-    // Log action
-    $stmtUser = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-    $stmtUser->execute([$_SESSION['email']]);
-    $user_id = $stmtUser->fetchColumn();
-    
-    if ($user_id) {
-        $pdo->prepare("INSERT INTO logs (user_id, action) VALUES (?, ?)")->execute([$user_id, "Deleted resident ID: " . $id]);
+    if ($stmt->rowCount() > 0) {
+        // Log the action
+        $logStmt = $pdo->prepare("INSERT INTO tbl_logs (user_id, action) VALUES (?, ?)");
+        $logStmt->execute([$_SESSION['user_id'], "Deleted resident: " . $resident['full_name'] . " (ID: $id)"]);
+
+        $_SESSION['success'] = "Resident deleted successfully.";
+    } else {
+        $_SESSION['error'] = "Failed to delete resident.";
     }
+} catch (PDOException $e) {
+    error_log("Delete resident error: " . $e->getMessage());
+    $_SESSION['error'] = "Database error occurred. Please try again.";
 }
 
-header("Location: ../residents/residents.php");
+// Redirect back to residents page
+header("Location: ../../public/index.php?action=residents");
 exit();
 ?>

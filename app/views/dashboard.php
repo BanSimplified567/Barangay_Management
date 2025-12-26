@@ -1,20 +1,25 @@
 <?php
 // app/views/dashboard.php
-// This file assumes that DashboardController.php has already fetched the required data
-// and made them available as variables.
-
-// Expected variables from DashboardController.php:
-// $total_residents
-// $pending_certifications
-// $upcoming_events
-// $open_blotters (optional)
-// $total_officials (optional)
-
 include 'header.php';
 ?>
 
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
+
+    <!-- Display success/error messages -->
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
 
     <!-- Stats Cards -->
     <div class="row">
@@ -28,7 +33,7 @@ include 'header.php';
                                 Total Residents
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <?php echo number_format($total_residents ?? 0); ?>
+                                <?php echo number_format($total_residents); ?>
                             </div>
                         </div>
                         <div class="col-auto">
@@ -49,7 +54,7 @@ include 'header.php';
                                 Pending Certifications
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <?php echo $pending_certifications ?? 0; ?>
+                                <?php echo $pending_certifications; ?>
                             </div>
                         </div>
                         <div class="col-auto">
@@ -70,7 +75,7 @@ include 'header.php';
                                 Upcoming Events
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <?php echo $upcoming_events ?? 0; ?>
+                                <?php echo $upcoming_events; ?>
                             </div>
                         </div>
                         <div class="col-auto">
@@ -91,7 +96,7 @@ include 'header.php';
                                 Open Blotters
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <?php echo $open_blotters ?? 0; ?>
+                                <?php echo $open_blotters; ?>
                             </div>
                         </div>
                         <div class="col-auto">
@@ -103,7 +108,7 @@ include 'header.php';
         </div>
     </div>
 
-    <!-- Additional Row (Optional - can be expanded later) -->
+    <!-- Additional Row -->
     <div class="row">
         <!-- Barangay Officials -->
         <div class="col-xl-4 col-md-6 mb-4">
@@ -115,7 +120,7 @@ include 'header.php';
                                 Current Officials
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <?php echo $total_officials ?? 0; ?>
+                                <?php echo $total_officials; ?>
                             </div>
                         </div>
                         <div class="col-auto">
@@ -125,7 +130,76 @@ include 'header.php';
                 </div>
             </div>
         </div>
+    </div>
 
+    <!-- Recent Activities and Announcements -->
+    <div class="row">
+        <!-- Recent Activities -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Activities</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($recent_logs)): ?>
+                                    <?php foreach ($recent_logs as $log): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($log['full_name']); ?></td>
+                                            <td><?php echo htmlspecialchars($log['action']); ?></td>
+                                            <td><?php echo date('M d, Y h:i A', strtotime($log['timestamp'])); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="3" class="text-center">No recent activities</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Announcements -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Announcements</h6>
+                </div>
+                <div class="card-body">
+                    <?php if (!empty($recent_announcements)): ?>
+                        <?php foreach ($recent_announcements as $announcement): ?>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title"><?php echo htmlspecialchars($announcement['title']); ?></h6>
+                                    <p class="card-text small"><?php echo substr(htmlspecialchars($announcement['content']), 0, 100); ?>...</p>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            Posted by: <?php echo htmlspecialchars($announcement['posted_by_name']); ?>
+                                            on <?php echo date('M d, Y', strtotime($announcement['post_date'])); ?>
+                                        </small>
+                                    </p>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-center">No recent announcements</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+<?php include 'footer.php'; ?>

@@ -1,30 +1,129 @@
-<?php include '../header.php'; ?>
-<!-- Assume $residents array from controller -->
+<?php
+// app/views/residents.php
+include '../header.php';
 
-<h1>Residents Management</h1>
-<a href="index.php?action=residents&sub=add" class="btn btn-primary mb-3">Add Resident</a>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Address</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($residents ?? [] as $resident): ?>
+// Get old form data if exists
+$old = $_SESSION['old'] ?? [];
+unset($_SESSION['old']);
+?>
+
+<div class="container-fluid">
+  <h1 class="h3 mb-4 text-gray-800">Residents Management</h1>
+
+  <!-- Success/Error Messages -->
+  <?php if (isset($_SESSION['success'])): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <?php echo $_SESSION['success'];
+      unset($_SESSION['success']); ?>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <?php endif; ?>
+
+  <?php if (isset($_SESSION['error'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <?php echo $_SESSION['error'];
+      unset($_SESSION['error']); ?>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <?php endif; ?>
+
+  <!-- Add Resident Button -->
+  <div class="mb-3">
+    <a href="index.php?action=residents&sub=add" class="btn btn-primary">
+      <i class="bi bi-person-plus me-1"></i>Add New Resident
+    </a>
+  </div>
+
+  <!-- Residents Table -->
+  <div class="card shadow">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">Residents List</h6>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover" id="residentsTable">
+          <thead class="table-dark">
             <tr>
-                <td><?php echo $resident['id']; ?></td>
-                <td><?php echo $resident['name']; ?></td>
-                <td><?php echo $resident['address']; ?></td>
-                <td>
-                    <a href="index.php?action=residents&sub=edit&id=<?php echo $resident['id']; ?>" class="btn btn-sm btn-warning">Edit</a>
-                    <a href="index.php?action=residents&sub=delete&id=<?php echo $resident['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?');">Delete</a>
-                </td>
+              <th>ID</th>
+              <th>Full Name</th>
+              <th>Address</th>
+              <th>Birthdate</th>
+              <th>Contact Number</th>
+              <th>Gender</th>
+              <th>Civil Status</th>
+              <th>Actions</th>
             </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+          </thead>
+          <tbody>
+            <?php if (!empty($residents)): ?>
+              <?php foreach ($residents as $resident): ?>
+                <tr>
+                  <td><?php echo htmlspecialchars($resident['id']); ?></td>
+                  <td><?php echo htmlspecialchars($resident['full_name']); ?></td>
+                  <td><?php echo htmlspecialchars($resident['address']); ?></td>
+                  <td><?php echo date('M d, Y', strtotime($resident['birthdate'])); ?></td>
+                  <td><?php echo htmlspecialchars($resident['contact_number'] ?? 'N/A'); ?></td>
+                  <td>
+                    <span class="badge bg-<?php echo $resident['gender'] == 'male' ? 'primary' : ($resident['gender'] == 'female' ? 'danger' : 'secondary'); ?>">
+                      <?php echo ucfirst($resident['gender']); ?>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge bg-info text-dark">
+                      <?php echo ucfirst($resident['civil_status']); ?>
+                    </span>
+                  </td>
+                  <td>
+                    <a href="index.php?action=residents&sub=edit&id=<?php echo $resident['id']; ?>"
+                      class="btn btn-sm btn-warning" title="Edit">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="index.php?action=residents&sub=delete&id=<?php echo $resident['id']; ?>"
+                      class="btn btn-sm btn-danger"
+                      onclick="return confirm('Are you sure you want to delete <?php echo addslashes($resident['full_name']); ?>?')"
+                      title="Delete">
+                      <i class="bi bi-trash"></i>
+                    </a>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <tr>
+                <td colspan="8" class="text-center py-4">
+                  <div class="text-muted">
+                    <i class="bi bi-people display-6"></i>
+                    <p class="mt-2">No residents found.</p>
+                  </div>
+                </td>
+              </tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
-<?php include 'footer.php'; ?>
+<script>
+  // Initialize DataTables if available
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof $ !== 'undefined' && $.fn.DataTable) {
+      $('#residentsTable').DataTable({
+        "order": [
+          [1, "asc"]
+        ], // Sort by name
+        "pageLength": 25,
+        "language": {
+          "search": "Search residents:",
+          "lengthMenu": "Show _MENU_ residents per page",
+          "zeroRecords": "No residents found",
+          "info": "Showing _START_ to _END_ of _TOTAL_ residents",
+          "infoEmpty": "No residents available",
+          "infoFiltered": "(filtered from _MAX_ total residents)"
+        }
+      });
+    }
+  });
+</script>
+
+<?php include '../footer.php'; ?>
