@@ -1,15 +1,9 @@
 <?php
 // app/controllers/LogController.php
+require_once 'BaseController.php';
 
-class LogController
+class LogController extends BaseController
 {
-  private $pdo;
-
-  public function __construct($pdo)
-  {
-    $this->pdo = $pdo;
-  }
-
   public function index()
   {
     $sub = $_GET['sub'] ?? 'list';
@@ -89,7 +83,11 @@ class LogController
       $users = [];
     }
 
-    require_once '../app/views/logs.php';
+    $this->render('logs/logs', [
+      'logs' => $logs,
+      'users' => $users,
+      'title' => 'System Activity Logs'
+    ]);
   }
 
   private function filterLogs()
@@ -103,8 +101,7 @@ class LogController
     // Check if user is admin
     if ($_SESSION['role'] !== 'admin') {
       $_SESSION['error'] = "Only administrators can clear logs.";
-      header("Location: index.php?action=logs");
-      exit();
+      $this->redirect('logs');
     }
 
     $confirmation = $_POST['confirmation'] ?? '';
@@ -129,11 +126,12 @@ class LogController
         $_SESSION['error'] = "Failed to clear logs: " . $e->getMessage();
       }
 
-      header("Location: index.php?action=logs");
-      exit();
+      $this->redirect('logs');
     } else {
       // Show confirmation form
-      require_once '../app/views/logs/clear_logs.php';
+      $this->render('logs/clear_logs', [
+        'title' => 'Clear System Logs'
+      ]);
     }
   }
 
@@ -142,8 +140,7 @@ class LogController
     // Check if user is admin or staff
     if (!in_array($_SESSION['role'], ['admin', 'staff'])) {
       $_SESSION['error'] = "Permission denied for export.";
-      header("Location: index.php?action=logs");
-      exit();
+      $this->redirect('logs');
     }
 
     $format = $_GET['format'] ?? 'csv';
@@ -167,8 +164,7 @@ class LogController
       }
     } catch (PDOException $e) {
       $_SESSION['error'] = "Failed to export logs: " . $e->getMessage();
-      header("Location: index.php?action=logs");
-      exit();
+      $this->redirect('logs');
     }
   }
 

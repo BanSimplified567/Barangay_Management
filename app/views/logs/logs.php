@@ -1,11 +1,9 @@
 <?php
-// app/views/logs.php
-include '../layout/header.php';
-
+// app/views/logs/logs.php
+// Note: Header and footer are automatically included by BaseController
 // Get users for filter dropdown
 $users = $users ?? [];
 ?>
-
 <div class="container-fluid">
   <h1 class="h3 mb-4 text-gray-800">System Activity Logs</h1>
 
@@ -290,5 +288,3 @@ $users = $users ?? [];
     }
   });
 </script>
-
-<?php include '../layout/footer.php'; ?>
