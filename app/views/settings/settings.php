@@ -1,6 +1,6 @@
 <?php
-// app/views/settings.php
-include 'header.php';
+// app/views/settings/settings.php
+// Note: Header and footer are automatically included by BaseController
 
 // Get settings from controller
 $settings = $settings ?? [];
@@ -37,7 +37,7 @@ $settings = $settings ?? [];
                 System Status
               </div>
               <div class="h5 mb-0 font-weight-bold text-gray-800">
-                <?php echo $settings['maintenance_mode'] == '1' ? 'Maintenance' : 'Active'; ?>
+                <?php echo ($settings['maintenance_mode'] ?? '0') == '1' ? 'Maintenance' : 'Active'; ?>
               </div>
             </div>
             <div class="col-auto">
@@ -77,7 +77,7 @@ $settings = $settings ?? [];
                 Email Notifications
               </div>
               <div class="h5 mb-0 font-weight-bold text-gray-800">
-                <?php echo $settings['email_notifications'] == '1' ? 'Enabled' : 'Disabled'; ?>
+                <?php echo ($settings['email_notifications'] ?? '1') == '1' ? 'Enabled' : 'Disabled'; ?>
               </div>
             </div>
             <div class="col-auto">
@@ -339,5 +339,3 @@ $settings = $settings ?? [];
     </div>
   </div>
 </div>
-
-<?php include 'footer.php'; ?>

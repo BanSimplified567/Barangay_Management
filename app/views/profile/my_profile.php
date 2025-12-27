@@ -1,6 +1,6 @@
 <?php
-// app/views/my_profile.php
-include '../layout/header.php';
+// app/views/profile/my_profile.php
+// Note: Header and footer are automatically included by BaseController
 
 // Get profile data from controller
 $profile = $profile ?? [];
@@ -62,7 +62,7 @@ $profile = $profile ?? [];
 
               <div class="mb-3">
                 <label class="form-label text-muted">Account Created</label>
-                <p class="form-control-plaintext"><?php echo date('M d, Y', strtotime($profile['created_at'] ?? '')); ?></p>
+                <p class="form-control-plaintext"><?php echo !empty($profile['created_at']) ? date('M d, Y', strtotime($profile['created_at'])) : 'Not available'; ?></p>
               </div>
             </div>
 
@@ -173,7 +173,7 @@ $profile = $profile ?? [];
           </div>
           <div class="mb-2">
             <i class="bi bi-calendar-check-fill text-info me-2"></i>
-            <span>Member since: <?php echo date('M Y', strtotime($profile['created_at'] ?? date('Y-m-d'))); ?></span>
+            <span>Member since: <?php echo !empty($profile['created_at']) ? date('M Y', strtotime($profile['created_at'])) : 'Recently'; ?></span>
           </div>
         </div>
       </div>
@@ -185,13 +185,13 @@ $profile = $profile ?? [];
         </div>
         <div class="card-body">
           <div class="d-grid gap-2">
-            <?php if ($_SESSION['role'] === 'resident'): ?>
+            <?php if (($_SESSION['role'] ?? '') === 'resident'): ?>
               <a href="index.php?action=certifications&sub=request" class="btn btn-outline-primary">
                 <i class="bi bi-file-earmark-plus me-1"></i>Request Certificate
               </a>
             <?php endif; ?>
 
-            <?php if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'staff'): ?>
+            <?php if (($_SESSION['role'] ?? '') === 'admin' || ($_SESSION['role'] ?? '') === 'staff'): ?>
               <a href="index.php?action=dashboard" class="btn btn-outline-primary">
                 <i class="bi bi-speedometer2 me-1"></i>Dashboard
               </a>
@@ -206,5 +206,3 @@ $profile = $profile ?? [];
     </div>
   </div>
 </div>
-
-<?php include '../layout/footer.php'; ?>

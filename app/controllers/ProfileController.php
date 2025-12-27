@@ -1,15 +1,9 @@
 <?php
 // app/controllers/ProfileController.php
+require_once 'BaseController.php';
 
-class ProfileController
+class ProfileController extends BaseController
 {
-  private $pdo;
-
-  public function __construct($pdo)
-  {
-    $this->pdo = $pdo;
-  }
-
   public function index()
   {
     $sub = $_GET['sub'] ?? 'view';
@@ -36,8 +30,7 @@ class ProfileController
   private function viewProfile()
   {
     if (!isset($_SESSION['user_id'])) {
-      header("Location: index.php?action=login");
-      exit();
+      $this->redirect('login');
     }
 
     $userId = $_SESSION['user_id'];
@@ -55,23 +48,23 @@ class ProfileController
 
       if (!$profile) {
         $_SESSION['error'] = "Profile not found.";
-        header("Location: index.php?action=dashboard");
-        exit();
+        $this->redirect('dashboard');
       }
     } catch (PDOException $e) {
       $_SESSION['error'] = "Failed to load profile: " . $e->getMessage();
-      header("Location: index.php?action=dashboard");
-      exit();
+      $this->redirect('dashboard');
     }
 
-    require_once '../app/views/my_profile.php';
+    $this->render('profile/my_profile', [
+      'profile' => $profile,
+      'title' => 'My Profile'
+    ]);
   }
 
   private function editForm()
   {
     if (!isset($_SESSION['user_id'])) {
-      header("Location: index.php?action=login");
-      exit();
+      $this->redirect('login');
     }
 
     $userId = $_SESSION['user_id'];
@@ -89,28 +82,27 @@ class ProfileController
 
       if (!$profile) {
         $_SESSION['error'] = "Profile not found.";
-        header("Location: index.php?action=dashboard");
-        exit();
+        $this->redirect('dashboard');
       }
     } catch (PDOException $e) {
       $_SESSION['error'] = "Failed to load profile: " . $e->getMessage();
-      header("Location: index.php?action=dashboard");
-      exit();
+      $this->redirect('dashboard');
     }
 
-    require_once '../app/views/profile/edit_profile.php';
+    $this->render('profile/edit_profile', [
+      'profile' => $profile,
+      'title' => 'Edit Profile'
+    ]);
   }
 
   private function updateProfile()
   {
     if (!isset($_SESSION['user_id'])) {
-      header("Location: index.php?action=login");
-      exit();
+      $this->redirect('login');
     }
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-      header("Location: index.php?action=profile&sub=edit");
-      exit();
+      $this->redirect('profile', ['sub' => 'edit']);
     }
 
     $userId = $_SESSION['user_id'];
@@ -196,42 +188,38 @@ class ProfileController
         $this->logAction($userId, "Updated profile information");
 
         $_SESSION['success'] = "Profile updated successfully!";
-        header("Location: index.php?action=profile");
-        exit();
+        $this->redirect('profile');
       } catch (PDOException $e) {
         $this->pdo->rollBack();
         $_SESSION['error'] = "Failed to update profile: " . $e->getMessage();
-        header("Location: index.php?action=profile&sub=edit");
-        exit();
+        $this->redirect('profile', ['sub' => 'edit']);
       }
     } else {
       $_SESSION['error'] = implode("<br>", $errors);
       $_SESSION['old'] = $_POST;
-      header("Location: index.php?action=profile&sub=edit");
-      exit();
+      $this->redirect('profile', ['sub' => 'edit']);
     }
   }
 
   private function changePassword()
   {
     if (!isset($_SESSION['user_id'])) {
-      header("Location: index.php?action=login");
-      exit();
+      $this->redirect('login');
     }
 
-    require_once '../app/views/profile/change_password.php';
+    $this->render('profile/change_password', [
+      'title' => 'Change Password'
+    ]);
   }
 
   private function updatePassword()
   {
     if (!isset($_SESSION['user_id'])) {
-      header("Location: index.php?action=login");
-      exit();
+      $this->redirect('login');
     }
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-      header("Location: index.php?action=profile&sub=change_password");
-      exit();
+      $this->redirect('profile', ['sub' => 'change_password']);
     }
 
     $userId = $_SESSION['user_id'];
@@ -275,20 +263,17 @@ class ProfileController
           $this->logAction($userId, "Changed password");
 
           $_SESSION['success'] = "Password changed successfully!";
-          header("Location: index.php?action=profile");
-          exit();
+          $this->redirect('profile');
         }
       } catch (PDOException $e) {
         $_SESSION['error'] = "Failed to change password: " . $e->getMessage();
-        header("Location: index.php?action=profile&sub=change_password");
-        exit();
+        $this->redirect('profile', ['sub' => 'change_password']);
       }
     }
 
     if (!empty($errors)) {
       $_SESSION['error'] = implode("<br>", $errors);
-      header("Location: index.php?action=profile&sub=change_password");
-      exit();
+      $this->redirect('profile', ['sub' => 'change_password']);
     }
   }
 

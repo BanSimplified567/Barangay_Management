@@ -1,17 +1,17 @@
 <?php
 // app/controllers/SettingsController.php
+require_once 'BaseController.php';
 
-class SettingsController
+class SettingsController extends BaseController
 {
-  private $pdo;
-
-  public function __construct($pdo)
-  {
-    $this->pdo = $pdo;
-  }
-
   public function index()
   {
+    // Check if user is admin
+    if (($_SESSION['role'] ?? '') !== 'admin') {
+      $_SESSION['error'] = "Access denied. Administrator privileges required.";
+      $this->redirect('dashboard');
+    }
+
     $sub = $_GET['sub'] ?? 'general';
 
     switch ($sub) {
@@ -50,31 +50,50 @@ class SettingsController
     // Get all settings
     $settings = $this->getAllSettings();
 
-    require_once '../app/views/settings.php';
+    $this->render('settings/settings', [
+      'settings' => $settings,
+      'title' => 'General Settings'
+    ]);
   }
 
   private function systemSettings()
   {
     $settings = $this->getAllSettings();
-    require_once '../app/views/settings/system.php';
+
+    $this->render('settings/system', [
+      'settings' => $settings,
+      'title' => 'System Settings'
+    ]);
   }
 
   private function emailSettings()
   {
     $settings = $this->getAllSettings();
-    require_once '../app/views/settings/email.php';
+
+    $this->render('settings/email', [
+      'settings' => $settings,
+      'title' => 'Email Settings'
+    ]);
   }
 
   private function securitySettings()
   {
     $settings = $this->getAllSettings();
-    require_once '../app/views/settings/security.php';
+
+    $this->render('settings/security', [
+      'settings' => $settings,
+      'title' => 'Security Settings'
+    ]);
   }
 
   private function backupSettings()
   {
     $settings = $this->getAllSettings();
-    require_once '../app/views/settings/backup.php';
+
+    $this->render('settings/backup', [
+      'settings' => $settings,
+      'title' => 'Backup Settings'
+    ]);
   }
 
   private function databaseSettings()
@@ -110,21 +129,23 @@ class SettingsController
       $dbInfo = ['total_size' => 0, 'table_count' => 0];
     }
 
-    require_once '../app/views/settings/database.php';
+    $this->render('settings/database', [
+      'tables' => $tables,
+      'dbInfo' => $dbInfo,
+      'title' => 'Database Information'
+    ]);
   }
 
   private function saveSettings()
   {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-      header("Location: index.php?action=settings");
-      exit();
+      $this->redirect('settings');
     }
 
     // Check if user is admin
-    if ($_SESSION['role'] !== 'admin') {
+    if (($_SESSION['role'] ?? '') !== 'admin') {
       $_SESSION['error'] = "Only administrators can change settings.";
-      header("Location: index.php?action=settings");
-      exit();
+      $this->redirect('settings');
     }
 
     try {
@@ -156,8 +177,12 @@ class SettingsController
             }
             break;
         }
+      }
 
-        if (empty($errors)) {
+      if (!empty($errors)) {
+        $_SESSION['error'] = implode("<br>", $errors);
+      } else {
+        foreach ($settingsToSave as $key => $value) {
           // Check if setting exists
           $stmt = $this->pdo->prepare("SELECT id FROM tbl_settings WHERE setting_key = ?");
           $stmt->execute([$key]);
@@ -172,13 +197,9 @@ class SettingsController
             $stmt->execute([$key, $value]);
           }
         }
-      }
 
-      if (!empty($errors)) {
-        $_SESSION['error'] = implode("<br>", $errors);
-      } else {
         // Log the action
-        $this->logAction($_SESSION['user_id'], "Updated system settings");
+        $this->logAction($_SESSION['user_id'] ?? 0, "Updated system settings");
 
         $_SESSION['success'] = "Settings saved successfully!";
       }
@@ -188,16 +209,14 @@ class SettingsController
 
     // Redirect back to appropriate section
     $section = $_POST['section'] ?? 'general';
-    header("Location: index.php?action=settings&sub=$section");
-    exit();
+    $this->redirect('settings', ['sub' => $section]);
   }
 
   private function performBackup()
   {
-    if ($_SESSION['role'] !== 'admin') {
+    if (($_SESSION['role'] ?? '') !== 'admin') {
       $_SESSION['error'] = "Only administrators can perform backups.";
-      header("Location: index.php?action=settings&sub=backup");
-      exit();
+      $this->redirect('settings', ['sub' => 'backup']);
     }
 
     try {
@@ -237,7 +256,7 @@ class SettingsController
       }
 
       // Save backup file
-      $backupDir = '../backups/';
+      $backupDir = BASE_PATH . '/backups/';
       if (!is_dir($backupDir)) {
         mkdir($backupDir, 0755, true);
       }
@@ -247,7 +266,7 @@ class SettingsController
 
       if (file_put_contents($filepath, $backupContent)) {
         // Log the action
-        $this->logAction($_SESSION['user_id'], "Created database backup: $filename");
+        $this->logAction($_SESSION['user_id'] ?? 0, "Created database backup: $filename");
 
         $_SESSION['success'] = "Backup created successfully: " . $filename;
       } else {
@@ -257,28 +276,24 @@ class SettingsController
       $_SESSION['error'] = "Backup failed: " . $e->getMessage();
     }
 
-    header("Location: index.php?action=settings&sub=backup");
-    exit();
+    $this->redirect('settings', ['sub' => 'backup']);
   }
 
   private function testEmail()
   {
-    if ($_SESSION['role'] !== 'admin') {
+    if (($_SESSION['role'] ?? '') !== 'admin') {
       $_SESSION['error'] = "Only administrators can test email settings.";
-      header("Location: index.php?action=settings&sub=email");
-      exit();
+      $this->redirect('settings', ['sub' => 'email']);
     }
 
     $to = $_SESSION['email'] ?? '';
 
     if (empty($to)) {
       $_SESSION['error'] = "No email address found in your profile.";
-      header("Location: index.php?action=settings&sub=email");
-      exit();
+      $this->redirect('settings', ['sub' => 'email']);
     }
 
     // This is a simplified email test
-    // In production, you would use PHPMailer or similar
     $subject = "Barangay System - Email Test";
     $message = "This is a test email from your Barangay Management System.\n\n";
     $message .= "Sent at: " . date('Y-m-d H:i:s') . "\n";
@@ -291,15 +306,14 @@ class SettingsController
 
     if (@mail($to, $subject, $message, $headers)) {
       // Log the action
-      $this->logAction($_SESSION['user_id'], "Sent test email to $to");
+      $this->logAction($_SESSION['user_id'] ?? 0, "Sent test email to $to");
 
       $_SESSION['success'] = "Test email sent to " . $to;
     } else {
       $_SESSION['error'] = "Failed to send test email. Check your server's mail configuration.";
     }
 
-    header("Location: index.php?action=settings&sub=email");
-    exit();
+    $this->redirect('settings', ['sub' => 'email']);
   }
 
   private function getAllSettings()

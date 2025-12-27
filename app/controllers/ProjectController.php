@@ -1,15 +1,9 @@
 <?php
 // app/controllers/ProjectController.php
+require_once 'BaseController.php';
 
-class ProjectController
+class ProjectController extends BaseController
 {
-  private $pdo;
-
-  public function __construct($pdo)
-  {
-    $this->pdo = $pdo;
-  }
-
   public function index()
   {
     $sub = $_GET['sub'] ?? 'list';
@@ -24,8 +18,8 @@ class ProjectController
       case 'delete':
         $this->delete($_GET['id'] ?? 0);
         break;
-      case 'create':
-        $this->create();
+      case 'store': // Changed from 'create' to match form action
+        $this->store();
         break;
       case 'update':
         $this->update($_GET['id'] ?? 0);
@@ -73,7 +67,10 @@ class ProjectController
       }
     }
 
-    require_once '../app/views/projects.php';
+    $this->render('projects/projects', [
+      'projects' => $projects,
+      'title' => 'Barangay Projects'
+    ]);
   }
 
   private function createProjectsTable()
@@ -169,15 +166,16 @@ class ProjectController
 
   private function addForm()
   {
-    require_once '../app/views/projects/add_project.php';
+    $this->render('projects/add_projects', [
+      'title' => 'Add New Project'
+    ]);
   }
 
   private function editForm($id)
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid project ID.";
-      header("Location: index.php?action=projects");
-      exit();
+      $this->redirect('projects');
     }
 
     try {
@@ -187,24 +185,24 @@ class ProjectController
 
       if (!$project) {
         $_SESSION['error'] = "Project not found.";
-        header("Location: index.php?action=projects");
-        exit();
+        $this->redirect('projects');
       }
     } catch (PDOException $e) {
       $_SESSION['error'] = "Failed to load project: " . $e->getMessage();
-      header("Location: index.php?action=projects");
-      exit();
+      $this->redirect('projects');
     }
 
-    require_once '../app/views/projects/edit_project.php';
+    $this->render('projects/edit_projects', [
+      'project' => $project,
+      'title' => 'Edit Project'
+    ]);
   }
 
   private function view($id)
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid project ID.";
-      header("Location: index.php?action=projects");
-      exit();
+      $this->redirect('projects');
     }
 
     try {
@@ -214,23 +212,23 @@ class ProjectController
 
       if (!$project) {
         $_SESSION['error'] = "Project not found.";
-        header("Location: index.php?action=projects");
-        exit();
+        $this->redirect('projects');
       }
     } catch (PDOException $e) {
       $_SESSION['error'] = "Failed to load project: " . $e->getMessage();
-      header("Location: index.php?action=projects");
-      exit();
+      $this->redirect('projects');
     }
 
-    require_once '../app/views/projects/view_project.php';
+    $this->render('projects/view_projects', [
+      'project' => $project,
+      'title' => htmlspecialchars($project['name'])
+    ]);
   }
 
-  private function create()
+  private function store() // Changed from create() to store()
   {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-      header("Location: index.php?action=projects&sub=add");
-      exit();
+      $this->redirect('projects', ['sub' => 'add']);
     }
 
     $errors = [];
@@ -285,18 +283,15 @@ class ProjectController
         $this->logAction($_SESSION['user_id'] ?? 0, "Created project: $name (ID: $projectId)");
 
         $_SESSION['success'] = "Project created successfully!";
-        header("Location: index.php?action=projects");
-        exit();
+        $this->redirect('projects');
       } catch (PDOException $e) {
         $_SESSION['error'] = "Failed to create project: " . $e->getMessage();
-        header("Location: index.php?action=projects&sub=add");
-        exit();
+        $this->redirect('projects', ['sub' => 'add']);
       }
     } else {
       $_SESSION['error'] = implode("<br>", $errors);
       $_SESSION['old'] = $_POST;
-      header("Location: index.php?action=projects&sub=add");
-      exit();
+      $this->redirect('projects', ['sub' => 'add']);
     }
   }
 
@@ -304,13 +299,11 @@ class ProjectController
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid project ID.";
-      header("Location: index.php?action=projects");
-      exit();
+      $this->redirect('projects');
     }
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-      header("Location: index.php?action=projects&sub=edit&id=$id");
-      exit();
+      $this->redirect('projects', ['sub' => 'edit', 'id' => $id]);
     }
 
     $errors = [];
@@ -378,18 +371,15 @@ class ProjectController
         $this->logAction($_SESSION['user_id'] ?? 0, "Updated project: $name (ID: $id)");
 
         $_SESSION['success'] = "Project updated successfully!";
-        header("Location: index.php?action=projects");
-        exit();
+        $this->redirect('projects');
       } catch (PDOException $e) {
         $_SESSION['error'] = "Failed to update project: " . $e->getMessage();
-        header("Location: index.php?action=projects&sub=edit&id=$id");
-        exit();
+        $this->redirect('projects', ['sub' => 'edit', 'id' => $id]);
       }
     } else {
       $_SESSION['error'] = implode("<br>", $errors);
       $_SESSION['old'] = $_POST;
-      header("Location: index.php?action=projects&sub=edit&id=$id");
-      exit();
+      $this->redirect('projects', ['sub' => 'edit', 'id' => $id]);
     }
   }
 
@@ -397,8 +387,7 @@ class ProjectController
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid project ID.";
-      header("Location: index.php?action=projects");
-      exit();
+      $this->redirect('projects');
     }
 
     try {
@@ -423,16 +412,14 @@ class ProjectController
       $_SESSION['error'] = "Delete failed: " . $e->getMessage();
     }
 
-    header("Location: index.php?action=projects");
-    exit();
+    $this->redirect('projects');
   }
 
   private function complete($id)
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid project ID.";
-      header("Location: index.php?action=projects");
-      exit();
+      $this->redirect('projects');
     }
 
     try {
@@ -456,16 +443,14 @@ class ProjectController
       $_SESSION['error'] = "Failed to complete project: " . $e->getMessage();
     }
 
-    header("Location: index.php?action=projects");
-    exit();
+    $this->redirect('projects');
   }
 
   private function cancel($id)
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid project ID.";
-      header("Location: index.php?action=projects");
-      exit();
+      $this->redirect('projects');
     }
 
     try {
@@ -489,8 +474,7 @@ class ProjectController
       $_SESSION['error'] = "Failed to cancel project: " . $e->getMessage();
     }
 
-    header("Location: index.php?action=projects");
-    exit();
+    $this->redirect('projects');
   }
 
   private function logAction($userId, $action)

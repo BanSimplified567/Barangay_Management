@@ -1,8 +1,7 @@
 <?php
 // app/views/projects.php
-include 'header.php';
+// Note: Header and footer are automatically included by BaseController
 ?>
-
 <div class="container-fluid">
   <h1 class="h3 mb-4 text-gray-800">Barangay Projects</h1>
 
@@ -357,5 +356,3 @@ include 'header.php';
     }
   });
 </script>
-
-<?php include 'footer.php'; ?>
