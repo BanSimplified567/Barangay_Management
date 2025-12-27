@@ -1,8 +1,7 @@
 <?php
-// app/views/officials.php
-include 'header.php';
+// app/views/official/officials.php
+// Note: Header and footer are automatically included by BaseController
 ?>
-
 <div class="container-fluid">
   <h1 class="h3 mb-4 text-gray-800">Barangay Officials</h1>
 
@@ -178,5 +177,3 @@ include 'header.php';
     }
   });
 </script>
-
-<?php include 'footer.php'; ?>

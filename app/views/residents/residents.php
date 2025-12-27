@@ -1,14 +1,10 @@
 <?php
-// app/views/residents.php
-include '../header.php';
-
-// Get old form data if exists
-$old = $_SESSION['old'] ?? [];
-unset($_SESSION['old']);
+// app/views/residents/residents.php
+// NO header/footer includes here - they're handled by BaseController
 ?>
 
 <div class="container-fluid">
-  <h1 class="h3 mb-4 text-gray-800">Residents Management</h1>
+  <h1 class="h3 mb-4 text-gray-800"><?php echo $title ?? 'Residents Management'; ?></h1>
 
   <!-- Success/Error Messages -->
   <?php if (isset($_SESSION['success'])): ?>
@@ -41,7 +37,7 @@ unset($_SESSION['old']);
     </div>
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table table-striped table-hover" id="residentsTable">
+        <table class="table table-striped table-hover data-table">
           <thead class="table-dark">
             <tr>
               <th>ID</th>
@@ -103,27 +99,3 @@ unset($_SESSION['old']);
     </div>
   </div>
 </div>
-
-<script>
-  // Initialize DataTables if available
-  document.addEventListener('DOMContentLoaded', function() {
-    if (typeof $ !== 'undefined' && $.fn.DataTable) {
-      $('#residentsTable').DataTable({
-        "order": [
-          [1, "asc"]
-        ], // Sort by name
-        "pageLength": 25,
-        "language": {
-          "search": "Search residents:",
-          "lengthMenu": "Show _MENU_ residents per page",
-          "zeroRecords": "No residents found",
-          "info": "Showing _START_ to _END_ of _TOTAL_ residents",
-          "infoEmpty": "No residents available",
-          "infoFiltered": "(filtered from _MAX_ total residents)"
-        }
-      });
-    }
-  });
-</script>
-
-<?php include '../footer.php'; ?>

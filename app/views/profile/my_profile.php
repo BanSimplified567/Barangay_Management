@@ -1,6 +1,6 @@
 <?php
 // app/views/my_profile.php
-include '../header.php';
+include '../layout/header.php';
 
 // Get profile data from controller
 $profile = $profile ?? [];
@@ -207,4 +207,4 @@ $profile = $profile ?? [];
   </div>
 </div>
 
-<?php include '../footer.php'; ?>
+<?php include '../layout/footer.php'; ?>

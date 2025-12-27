@@ -1,14 +1,9 @@
 <?php
 // app/controllers/ResidentsController.php
+require_once 'BaseController.php';
 
-class ResidentsController
+class ResidentsController extends BaseController
 {
-  private $pdo;
-
-  public function __construct($pdo)
-  {
-    $this->pdo = $pdo;
-  }
 
   public function index()
   {
@@ -28,7 +23,7 @@ class ResidentsController
         $this->create();
         break;
       case 'update':
-        $this->update($_GET['id'] ?? 0);
+        $this->update();
         break;
       default:
         $this->list();
@@ -37,7 +32,7 @@ class ResidentsController
   }
 
   public function list()
-  {  // Changed to public
+  {
     try {
       $stmt = $this->pdo->query("
                 SELECT id, full_name, address, birthdate, contact_number, gender, civil_status
@@ -50,20 +45,24 @@ class ResidentsController
       $residents = [];
     }
 
-    require_once '../app/views/residents/residents.php';
+    $this->render('residents/residents', [
+      'residents' => $residents,
+      'title' => 'Residents Management'
+    ]);
   }
 
   public function addForm()
-  {  // Changed to public
-    require_once '../app/views/residents/add_residents.php';
+  {
+    $this->render('residents/add_residents', [
+      'title' => 'Add New Resident'
+    ]);
   }
 
   public function editForm($id)
-  {  // Changed to public
+  {
     if (!$id) {
       $_SESSION['error'] = "Invalid resident ID.";
-      header("Location: index.php?action=residents");
-      exit();
+      $this->redirect('residents');
     }
 
     try {
@@ -73,23 +72,23 @@ class ResidentsController
 
       if (!$resident) {
         $_SESSION['error'] = "Resident not found.";
-        header("Location: index.php?action=residents");
-        exit();
+        $this->redirect('residents');
       }
     } catch (PDOException $e) {
       $_SESSION['error'] = "Failed to load resident: " . $e->getMessage();
-      header("Location: index.php?action=residents");
-      exit();
+      $this->redirect('residents');
     }
 
-    require_once '../app/views/residents/edit_residents.php';
+    $this->render('residents/edit_residents', [
+      'resident' => $resident,
+      'title' => 'Edit Resident'
+    ]);
   }
 
   public function create()
-  {  // Changed to public
+  {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-      header("Location: index.php?action=residents&sub=add");
-      exit();
+      $this->redirect('residents', ['sub' => 'add']);
     }
 
     $errors = [];
@@ -132,37 +131,30 @@ class ResidentsController
         $this->logAction($_SESSION['user_id'] ?? 0, "Added resident: $full_name");
 
         $_SESSION['success'] = "Resident added successfully!";
-        header("Location: index.php?action=residents");
-        exit();
+        $this->redirect('residents');
       } catch (PDOException $e) {
         $_SESSION['error'] = "Failed to add resident: " . $e->getMessage();
-        header("Location: index.php?action=residents&sub=add");
-        exit();
+        $this->redirect('residents', ['sub' => 'add']);
       }
     } else {
       $_SESSION['error'] = implode("<br>", $errors);
       $_SESSION['old'] = $_POST;
-      header("Location: index.php?action=residents&sub=add");
-      exit();
+      $this->redirect('residents', ['sub' => 'add']);
     }
   }
 
-  public function update($id = null)
-  {  // Changed to public, added default parameter
+  public function update()
+  {
     // Get ID from POST if not provided as parameter
-    if (!$id) {
-      $id = $_POST['id'] ?? 0;
-    }
+    $id = $_POST['id'] ?? 0;
 
     if (!$id) {
       $_SESSION['error'] = "Invalid resident ID.";
-      header("Location: index.php?action=residents");
-      exit();
+      $this->redirect('residents');
     }
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-      header("Location: index.php?action=residents&sub=edit&id=$id");
-      exit();
+      $this->redirect('residents', ['sub' => 'edit', 'id' => $id]);
     }
 
     $errors = [];
@@ -205,27 +197,23 @@ class ResidentsController
         $this->logAction($_SESSION['user_id'] ?? 0, "Updated resident: $full_name (ID: $id)");
 
         $_SESSION['success'] = "Resident updated successfully!";
-        header("Location: index.php?action=residents");
-        exit();
+        $this->redirect('residents');
       } catch (PDOException $e) {
         $_SESSION['error'] = "Failed to update resident: " . $e->getMessage();
-        header("Location: index.php?action=residents&sub=edit&id=$id");
-        exit();
+        $this->redirect('residents', ['sub' => 'edit', 'id' => $id]);
       }
     } else {
       $_SESSION['error'] = implode("<br>", $errors);
       $_SESSION['old'] = $_POST;
-      header("Location: index.php?action=residents&sub=edit&id=$id");
-      exit();
+      $this->redirect('residents', ['sub' => 'edit', 'id' => $id]);
     }
   }
 
   public function delete($id)
-  {  // Changed to public
+  {
     if (!$id) {
       $_SESSION['error'] = "Invalid resident ID.";
-      header("Location: index.php?action=residents");
-      exit();
+      $this->redirect('residents');
     }
 
     try {
@@ -250,8 +238,7 @@ class ResidentsController
       $_SESSION['error'] = "Delete failed: " . $e->getMessage();
     }
 
-    header("Location: index.php?action=residents");
-    exit();
+    $this->redirect('residents');
   }
 
   private function logAction($userId, $action)

@@ -1,15 +1,9 @@
 <?php
 // app/controllers/AnnouncementController.php
+require_once 'BaseController.php';
 
-class AnnouncementController
+class AnnouncementController extends BaseController
 {
-  private $pdo;
-
-  public function __construct($pdo)
-  {
-    $this->pdo = $pdo;
-  }
-
   public function index()
   {
     $sub = $_GET['sub'] ?? 'list';
@@ -24,8 +18,8 @@ class AnnouncementController
       case 'delete':
         $this->delete($_GET['id'] ?? 0);
         break;
-      case 'create':
-        $this->create();
+      case 'store': // Changed from 'create' to match form action
+        $this->store();
         break;
       case 'update':
         $this->update($_GET['id'] ?? 0);
@@ -54,20 +48,24 @@ class AnnouncementController
       $announcements = [];
     }
 
-    require_once '../app/views/announcements.php';
+    $this->render('announcements/announcements', [
+      'announcements' => $announcements,
+      'title' => 'Barangay Announcements'
+    ]);
   }
 
   private function addForm()
   {
-    require_once '../app/views/announcements/add_announcement.php';
+    $this->render('announcements/add_announcement', [
+      'title' => 'Post New Announcement'
+    ]);
   }
 
   private function editForm($id)
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid announcement ID.";
-      header("Location: index.php?action=announcements");
-      exit();
+      $this->redirect('announcements');
     }
 
     try {
@@ -77,24 +75,24 @@ class AnnouncementController
 
       if (!$announcement) {
         $_SESSION['error'] = "Announcement not found.";
-        header("Location: index.php?action=announcements");
-        exit();
+        $this->redirect('announcements');
       }
     } catch (PDOException $e) {
       $_SESSION['error'] = "Failed to load announcement: " . $e->getMessage();
-      header("Location: index.php?action=announcements");
-      exit();
+      $this->redirect('announcements');
     }
 
-    require_once '../app/views/announcements/edit_announcement.php';
+    $this->render('announcements/edit_announcement', [
+      'announcement' => $announcement,
+      'title' => 'Edit Announcement'
+    ]);
   }
 
   private function view($id)
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid announcement ID.";
-      header("Location: index.php?action=announcements");
-      exit();
+      $this->redirect('announcements');
     }
 
     try {
@@ -109,23 +107,23 @@ class AnnouncementController
 
       if (!$announcement) {
         $_SESSION['error'] = "Announcement not found.";
-        header("Location: index.php?action=announcements");
-        exit();
+        $this->redirect('announcements');
       }
     } catch (PDOException $e) {
       $_SESSION['error'] = "Failed to load announcement: " . $e->getMessage();
-      header("Location: index.php?action=announcements");
-      exit();
+      $this->redirect('announcements');
     }
 
-    require_once '../app/views/announcements/view_announcement.php';
+    $this->render('announcements/view_announcement', [
+      'announcement' => $announcement,
+      'title' => htmlspecialchars($announcement['title'])
+    ]);
   }
 
-  private function create()
+  private function store() // Changed from create() to store()
   {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-      header("Location: index.php?action=announcements&sub=add");
-      exit();
+      $this->redirect('announcements', ['sub' => 'add']);
     }
 
     $errors = [];
@@ -160,18 +158,15 @@ class AnnouncementController
         $this->logAction($_SESSION['user_id'] ?? 0, "Posted announcement: $title (ID: $announcementId)");
 
         $_SESSION['success'] = "Announcement posted successfully!";
-        header("Location: index.php?action=announcements");
-        exit();
+        $this->redirect('announcements');
       } catch (PDOException $e) {
         $_SESSION['error'] = "Failed to post announcement: " . $e->getMessage();
-        header("Location: index.php?action=announcements&sub=add");
-        exit();
+        $this->redirect('announcements', ['sub' => 'add']);
       }
     } else {
       $_SESSION['error'] = implode("<br>", $errors);
       $_SESSION['old'] = $_POST;
-      header("Location: index.php?action=announcements&sub=add");
-      exit();
+      $this->redirect('announcements', ['sub' => 'add']);
     }
   }
 
@@ -179,13 +174,11 @@ class AnnouncementController
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid announcement ID.";
-      header("Location: index.php?action=announcements");
-      exit();
+      $this->redirect('announcements');
     }
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-      header("Location: index.php?action=announcements&sub=edit&id=$id");
-      exit();
+      $this->redirect('announcements', ['sub' => 'edit', 'id' => $id]);
     }
 
     $errors = [];
@@ -219,18 +212,15 @@ class AnnouncementController
         $this->logAction($_SESSION['user_id'] ?? 0, "Updated announcement: $title (ID: $id)");
 
         $_SESSION['success'] = "Announcement updated successfully!";
-        header("Location: index.php?action=announcements");
-        exit();
+        $this->redirect('announcements');
       } catch (PDOException $e) {
         $_SESSION['error'] = "Failed to update announcement: " . $e->getMessage();
-        header("Location: index.php?action=announcements&sub=edit&id=$id");
-        exit();
+        $this->redirect('announcements', ['sub' => 'edit', 'id' => $id]);
       }
     } else {
       $_SESSION['error'] = implode("<br>", $errors);
       $_SESSION['old'] = $_POST;
-      header("Location: index.php?action=announcements&sub=edit&id=$id");
-      exit();
+      $this->redirect('announcements', ['sub' => 'edit', 'id' => $id]);
     }
   }
 
@@ -238,8 +228,7 @@ class AnnouncementController
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid announcement ID.";
-      header("Location: index.php?action=announcements");
-      exit();
+      $this->redirect('announcements');
     }
 
     try {
@@ -264,8 +253,7 @@ class AnnouncementController
       $_SESSION['error'] = "Delete failed: " . $e->getMessage();
     }
 
-    header("Location: index.php?action=announcements");
-    exit();
+    $this->redirect('announcements');
   }
 
   private function logAction($userId, $action)

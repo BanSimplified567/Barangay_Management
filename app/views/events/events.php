@@ -1,8 +1,7 @@
 <?php
-// app/views/events.php
-include 'header.php';
+// app/views/events/events.php
+// Note: Header and footer are automatically included by BaseController
 ?>
-
 <div class="container-fluid">
   <h1 class="h3 mb-4 text-gray-800">Barangay Events</h1>
 
@@ -232,5 +231,3 @@ include 'header.php';
     }
   });
 </script>
-
-<?php include 'footer.php'; ?>

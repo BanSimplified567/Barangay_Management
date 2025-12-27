@@ -1,15 +1,9 @@
 <?php
 // app/controllers/OfficialController.php
+require_once 'BaseController.php';
 
-class OfficialController
+class OfficialController extends BaseController
 {
-  private $pdo;
-
-  public function __construct($pdo)
-  {
-    $this->pdo = $pdo;
-  }
-
   public function index()
   {
     $sub = $_GET['sub'] ?? 'list';
@@ -24,8 +18,8 @@ class OfficialController
       case 'delete':
         $this->delete($_GET['id'] ?? 0);
         break;
-      case 'create':
-        $this->create();
+      case 'store': // Changed from 'create' to match form action
+        $this->store();
         break;
       case 'update':
         $this->update($_GET['id'] ?? 0);
@@ -59,7 +53,10 @@ class OfficialController
       $officials = [];
     }
 
-    require_once '../app/views/officials.php';
+    $this->render('official/officials', [
+      'officials' => $officials,
+      'title' => 'Barangay Officials'
+    ]);
   }
 
   private function addForm()
@@ -79,15 +76,17 @@ class OfficialController
       $residents = [];
     }
 
-    require_once '../app/views/officials/add_official.php';
+    $this->render('official/add_official', [
+      'residents' => $residents,
+      'title' => 'Add New Official'
+    ]);
   }
 
   private function editForm($id)
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid official ID.";
-      header("Location: index.php?action=officials");
-      exit();
+      $this->redirect('officials');
     }
 
     try {
@@ -102,23 +101,23 @@ class OfficialController
 
       if (!$official) {
         $_SESSION['error'] = "Official not found.";
-        header("Location: index.php?action=officials");
-        exit();
+        $this->redirect('officials');
       }
     } catch (PDOException $e) {
       $_SESSION['error'] = "Failed to load official: " . $e->getMessage();
-      header("Location: index.php?action=officials");
-      exit();
+      $this->redirect('officials');
     }
 
-    require_once '../app/views/officials/edit_official.php';
+    $this->render('official/edit_official', [
+      'official' => $official,
+      'title' => 'Edit Official'
+    ]);
   }
 
-  private function create()
+  private function store() // Changed from create() to store()
   {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-      header("Location: index.php?action=officials&sub=add");
-      exit();
+      $this->redirect('officials', ['sub' => 'add']);
     }
 
     $errors = [];
@@ -172,21 +171,18 @@ class OfficialController
           $this->logAction($_SESSION['user_id'] ?? 0, "Added official: " . ($resident['full_name'] ?? 'Unknown') . " as $position");
 
           $_SESSION['success'] = "Official added successfully!";
-          header("Location: index.php?action=officials");
-          exit();
+          $this->redirect('officials');
         }
       } catch (PDOException $e) {
         $_SESSION['error'] = "Failed to add official: " . $e->getMessage();
-        header("Location: index.php?action=officials&sub=add");
-        exit();
+        $this->redirect('officials', ['sub' => 'add']);
       }
     }
 
     if (!empty($errors)) {
       $_SESSION['error'] = implode("<br>", $errors);
       $_SESSION['old'] = $_POST;
-      header("Location: index.php?action=officials&sub=add");
-      exit();
+      $this->redirect('officials', ['sub' => 'add']);
     }
   }
 
@@ -194,13 +190,11 @@ class OfficialController
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid official ID.";
-      header("Location: index.php?action=officials");
-      exit();
+      $this->redirect('officials');
     }
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-      header("Location: index.php?action=officials&sub=edit&id=$id");
-      exit();
+      $this->redirect('officials', ['sub' => 'edit', 'id' => $id]);
     }
 
     $errors = [];
@@ -248,18 +242,15 @@ class OfficialController
         $this->logAction($_SESSION['user_id'] ?? 0, "Updated official: " . ($official['full_name'] ?? 'Unknown') . " - $position (ID: $id)");
 
         $_SESSION['success'] = "Official updated successfully!";
-        header("Location: index.php?action=officials");
-        exit();
+        $this->redirect('officials');
       } catch (PDOException $e) {
         $_SESSION['error'] = "Failed to update official: " . $e->getMessage();
-        header("Location: index.php?action=officials&sub=edit&id=$id");
-        exit();
+        $this->redirect('officials', ['sub' => 'edit', 'id' => $id]);
       }
     } else {
       $_SESSION['error'] = implode("<br>", $errors);
       $_SESSION['old'] = $_POST;
-      header("Location: index.php?action=officials&sub=edit&id=$id");
-      exit();
+      $this->redirect('officials', ['sub' => 'edit', 'id' => $id]);
     }
   }
 
@@ -267,8 +258,7 @@ class OfficialController
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid official ID.";
-      header("Location: index.php?action=officials");
-      exit();
+      $this->redirect('officials');
     }
 
     try {
@@ -298,8 +288,7 @@ class OfficialController
       $_SESSION['error'] = "Delete failed: " . $e->getMessage();
     }
 
-    header("Location: index.php?action=officials");
-    exit();
+    $this->redirect('officials');
   }
 
   private function logAction($userId, $action)

@@ -1,6 +1,6 @@
 <?php
 // app/views/profile/edit_profile.php
-include '../header.php';
+include '../layout/header.php';
 $old = $_SESSION['old'] ?? $profile ?? [];
 unset($_SESSION['old']);
 ?>
@@ -106,4 +106,4 @@ unset($_SESSION['old']);
   </div>
 </div>
 
-<?php include '../footer.php'; ?>
+<?php include '../layout/footer.php'; ?>

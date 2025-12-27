@@ -1,8 +1,7 @@
 <?php
-// Assume user role is in session from auth
-$role = $_SESSION['role'] ?? 'guest'; // Changed from 'user_role' to 'role'
+// app/views/layout/header.php
+$role = $_SESSION['role'] ?? 'guest';
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,7 +11,7 @@ $role = $_SESSION['role'] ?? 'guest'; // Changed from 'user_role' to 'role'
   <title>Barangay Management System</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="../style/style.css"> <!-- Your custom CSS -->
+  <link rel="stylesheet" href="/Barangay_Management/style/style.css">
 </head>
 
 <body>

@@ -1,15 +1,9 @@
 <?php
 // app/controllers/EventController.php
+require_once 'BaseController.php';
 
-class EventController
+class EventController extends BaseController
 {
-  private $pdo;
-
-  public function __construct($pdo)
-  {
-    $this->pdo = $pdo;
-  }
-
   public function index()
   {
     $sub = $_GET['sub'] ?? 'list';
@@ -24,8 +18,8 @@ class EventController
       case 'delete':
         $this->delete($_GET['id'] ?? 0);
         break;
-      case 'create':
-        $this->create();
+      case 'store': // Changed from 'create' to match form action
+        $this->store();
         break;
       case 'update':
         $this->update($_GET['id'] ?? 0);
@@ -57,20 +51,24 @@ class EventController
       $events = [];
     }
 
-    require_once '../app/views/events.php';
+    $this->render('events/events', [
+      'events' => $events,
+      'title' => 'Barangay Events'
+    ]);
   }
 
   private function addForm()
   {
-    require_once '../app/views/events/add_event.php';
+    $this->render('events/add_event', [
+      'title' => 'Add New Event'
+    ]);
   }
 
   private function editForm($id)
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid event ID.";
-      header("Location: index.php?action=events");
-      exit();
+      $this->redirect('events');
     }
 
     try {
@@ -80,23 +78,23 @@ class EventController
 
       if (!$event) {
         $_SESSION['error'] = "Event not found.";
-        header("Location: index.php?action=events");
-        exit();
+        $this->redirect('events');
       }
     } catch (PDOException $e) {
       $_SESSION['error'] = "Failed to load event: " . $e->getMessage();
-      header("Location: index.php?action=events");
-      exit();
+      $this->redirect('events');
     }
 
-    require_once '../app/views/events/edit_event.php';
+    $this->render('events/edit_event', [
+      'event' => $event,
+      'title' => 'Edit Event'
+    ]);
   }
 
-  private function create()
+  private function store() // Changed from create() to store()
   {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-      header("Location: index.php?action=events&sub=add");
-      exit();
+      $this->redirect('events', ['sub' => 'add']);
     }
 
     $errors = [];
@@ -139,18 +137,15 @@ class EventController
         $this->logAction($_SESSION['user_id'] ?? 0, "Created event: $name (ID: $eventId)");
 
         $_SESSION['success'] = "Event created successfully!";
-        header("Location: index.php?action=events");
-        exit();
+        $this->redirect('events');
       } catch (PDOException $e) {
         $_SESSION['error'] = "Failed to create event: " . $e->getMessage();
-        header("Location: index.php?action=events&sub=add");
-        exit();
+        $this->redirect('events', ['sub' => 'add']);
       }
     } else {
       $_SESSION['error'] = implode("<br>", $errors);
       $_SESSION['old'] = $_POST;
-      header("Location: index.php?action=events&sub=add");
-      exit();
+      $this->redirect('events', ['sub' => 'add']);
     }
   }
 
@@ -158,13 +153,11 @@ class EventController
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid event ID.";
-      header("Location: index.php?action=events");
-      exit();
+      $this->redirect('events');
     }
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-      header("Location: index.php?action=events&sub=edit&id=$id");
-      exit();
+      $this->redirect('events', ['sub' => 'edit', 'id' => $id]);
     }
 
     $errors = [];
@@ -209,18 +202,15 @@ class EventController
         $this->logAction($_SESSION['user_id'] ?? 0, "Updated event: $name (ID: $id)");
 
         $_SESSION['success'] = "Event updated successfully!";
-        header("Location: index.php?action=events");
-        exit();
+        $this->redirect('events');
       } catch (PDOException $e) {
         $_SESSION['error'] = "Failed to update event: " . $e->getMessage();
-        header("Location: index.php?action=events&sub=edit&id=$id");
-        exit();
+        $this->redirect('events', ['sub' => 'edit', 'id' => $id]);
       }
     } else {
       $_SESSION['error'] = implode("<br>", $errors);
       $_SESSION['old'] = $_POST;
-      header("Location: index.php?action=events&sub=edit&id=$id");
-      exit();
+      $this->redirect('events', ['sub' => 'edit', 'id' => $id]);
     }
   }
 
@@ -228,8 +218,7 @@ class EventController
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid event ID.";
-      header("Location: index.php?action=events");
-      exit();
+      $this->redirect('events');
     }
 
     try {
@@ -254,16 +243,14 @@ class EventController
       $_SESSION['error'] = "Delete failed: " . $e->getMessage();
     }
 
-    header("Location: index.php?action=events");
-    exit();
+    $this->redirect('events');
   }
 
   private function cancel($id)
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid event ID.";
-      header("Location: index.php?action=events");
-      exit();
+      $this->redirect('events');
     }
 
     try {
@@ -287,16 +274,14 @@ class EventController
       $_SESSION['error'] = "Failed to cancel event: " . $e->getMessage();
     }
 
-    header("Location: index.php?action=events");
-    exit();
+    $this->redirect('events');
   }
 
   private function complete($id)
   {
     if (!$id) {
       $_SESSION['error'] = "Invalid event ID.";
-      header("Location: index.php?action=events");
-      exit();
+      $this->redirect('events');
     }
 
     try {
@@ -320,8 +305,7 @@ class EventController
       $_SESSION['error'] = "Failed to complete event: " . $e->getMessage();
     }
 
-    header("Location: index.php?action=events");
-    exit();
+    $this->redirect('events');
   }
 
   private function logAction($userId, $action)

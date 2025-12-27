@@ -1,10 +1,7 @@
-<?php
-// app/views/blotters.php
-include 'header.php';
-?>
+
 
 <div class="container-fluid">
-    <h1 class="h3 mb-4 text-gray-800">Blotter Records</h1>
+    <h1 class="h3 mb-4 text-gray-800"><?php echo $title ?? 'Blotter Records'; ?></h1>
 
     <!-- Success/Error Messages -->
     <?php if (isset($_SESSION['success'])): ?>
@@ -113,7 +110,7 @@ include 'header.php';
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-hover" id="blottersTable">
+                <table class="table table-striped table-hover data-table">
                     <thead class="table-dark">
                         <tr>
                             <th>ID</th>
@@ -189,25 +186,3 @@ include 'header.php';
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize DataTables if available
-        if (typeof $ !== 'undefined' && $.fn.DataTable) {
-            $('#blottersTable').DataTable({
-                "order": [[4, "desc"]], // Sort by incident date descending
-                "pageLength": 25,
-                "language": {
-                    "search": "Search blotters:",
-                    "lengthMenu": "Show _MENU_ blotters per page",
-                    "zeroRecords": "No blotters found",
-                    "info": "Showing _START_ to _END_ of _TOTAL_ blotters",
-                    "infoEmpty": "No blotters available",
-                    "infoFiltered": "(filtered from _MAX_ total blotters)"
-                }
-            });
-        }
-    });
-</script>
-
-<?php include 'footer.php'; ?>

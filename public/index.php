@@ -1,7 +1,9 @@
 <?php
 // public/index.php
-
 session_start();
+
+// Define BASE_PATH constant
+define('BASE_PATH', dirname(__DIR__));
 
 require_once '../config/dbcon.php';                 // Database connection
 require_once '../app/middleware/auth.php';         // Authentication middleware
@@ -116,35 +118,10 @@ switch ($action) {
     require_once '../app/controllers/CrimeController.php';
     $controller = new CrimeController($pdo);
 
-    // Handle sub-actions
-    $sub = $_GET['sub'] ?? 'list';
-    switch ($sub) {
-      case 'add':
-        $controller->index();
-        break;
-      case 'edit':
-        $controller->index();
-        break;
-      case 'delete':
-        $controller->index();
-        break;
-      case 'create':
-        $controller->index();
-        break;
-      case 'update':
-        $controller->index();
-        break;
-      case 'investigate':
-        $controller->index();
-        break;
-      case 'resolve':
-        $controller->index();
-        break;
-      default:
-        $controller->index();
-        break;
-    }
+    // Call the index method which will handle sub-actions
+    $controller->index();
     break;
+
   case 'events':
     authorize(['admin', 'staff']);
     require_once '../app/controllers/EventController.php';
@@ -208,37 +185,37 @@ switch ($action) {
     }
     break;
 
-  case 'announcements':
-    authorize(['admin', 'staff']);
-    require_once '../app/controllers/AnnouncementController.php';
-    $controller = new AnnouncementController($pdo);
+    case 'announcements':
+      authorize(['admin', 'staff']);
+      require_once '../app/controllers/AnnouncementController.php';
+      $controller = new AnnouncementController($pdo);
 
-    // Handle sub-actions
-    $sub = $_GET['sub'] ?? 'list';
-    switch ($sub) {
-      case 'add':
-        $controller->index();
-        break;
-      case 'edit':
-        $controller->index();
-        break;
-      case 'delete':
-        $controller->index();
-        break;
-      case 'create':
-        $controller->index();
-        break;
-      case 'update':
-        $controller->index();
-        break;
-      case 'view':
-        $controller->index();
-        break;
-      default:
-        $controller->index();
-        break;
-    }
-    break;
+      // Handle sub-actions
+      $sub = $_GET['sub'] ?? 'list';
+      switch ($sub) {
+        case 'add':
+          $controller->index();
+          break;
+        case 'edit':
+          $controller->index();
+          break;
+        case 'delete':
+          $controller->index();
+          break;
+        case 'create':
+          $controller->index();
+          break;
+        case 'update':
+          $controller->index();
+          break;
+        case 'view':
+          $controller->index();
+          break;
+        default:
+          $controller->index();
+          break;
+      }
+      break;
   case 'logs':
     authorize(['admin', 'staff']);
     require_once '../app/controllers/LogController.php';

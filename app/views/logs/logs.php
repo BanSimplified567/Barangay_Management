@@ -1,6 +1,6 @@
 <?php
 // app/views/logs.php
-include '../header.php';
+include '../layout/header.php';
 
 // Get users for filter dropdown
 $users = $users ?? [];
@@ -291,4 +291,4 @@ $users = $users ?? [];
   });
 </script>
 
-<?php include '../footer.php'; ?>
+<?php include '../layout/footer.php'; ?>

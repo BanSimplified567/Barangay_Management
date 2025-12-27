@@ -1,6 +1,6 @@
 <?php
 // app/views/profile/change_password.php
-include '../header.php';
+include '../layout/header.php';
 ?>
 
 <div class="container-fluid">
@@ -236,4 +236,4 @@ include '../header.php';
   });
 </script>
 
-<?php include '../footer.php'; ?>
+<?php include '../layout/footer.php'; ?>

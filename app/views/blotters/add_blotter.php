@@ -1,12 +1,12 @@
 <?php
 // app/views/blotters/add_blotter.php
-include '../header.php';
+// NO header/footer includes here - they're handled by BaseController
 $old = $_SESSION['old'] ?? [];
 unset($_SESSION['old']);
 ?>
 
 <div class="container-fluid">
-    <h1 class="h3 mb-4 text-gray-800">Add New Blotter</h1>
+    <h1 class="h3 mb-4 text-gray-800"><?php echo $title ?? 'Add New Blotter'; ?></h1>
 
     <div class="row">
         <div class="col-md-8">
@@ -46,12 +46,13 @@ unset($_SESSION['old']);
                             <div class="col-md-12 mb-3">
                                 <label for="description" class="form-label">Description of Incident <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="description" name="description" rows="4" required><?php echo htmlspecialchars($old['description'] ?? ''); ?></textarea>
+                                <div class="form-text">Provide detailed description of the incident, including time, location, and what happened.</div>
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label for="incident_date" class="form-label">Incident Date <span class="text-danger">*</span></label>
                                 <input type="date" class="form-control" id="incident_date" name="incident_date"
-                                       value="<?php echo htmlspecialchars($old['incident_date'] ?? date('Y-m-d')); ?>" required>
+                                    value="<?php echo htmlspecialchars($old['incident_date'] ?? date('Y-m-d')); ?>" required>
                             </div>
                         </div>
 
@@ -67,7 +68,28 @@ unset($_SESSION['old']);
                 </div>
             </div>
         </div>
+
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Tips</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-info-circle me-2"></i>About Blotters</h6>
+                        <p class="mb-2">Blotter records are official complaints filed in the barangay.</p>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <h6><i class="bi bi-exclamation-triangle me-2"></i>Important Notes</h6>
+                        <ul class="mb-0">
+                            <li>Always verify the identities of involved parties</li>
+                            <li>Record incidents accurately and objectively</li>
+                            <li>Maintain confidentiality of sensitive information</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-<?php include '../footer.php'; ?>

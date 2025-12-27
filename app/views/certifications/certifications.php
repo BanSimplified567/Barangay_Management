@@ -1,10 +1,10 @@
 <?php
-// app/views/certifications.php
-include 'header.php';
+// app/views/certifications/certifications.php
+// NO header/footer includes here - they're handled by BaseController
 ?>
 
 <div class="container-fluid">
-    <h1 class="h3 mb-4 text-gray-800">Certifications Management</h1>
+    <h1 class="h3 mb-4 text-gray-800"><?php echo $title ?? 'Certifications Management'; ?></h1>
 
     <!-- Success/Error Messages -->
     <?php if (isset($_SESSION['success'])): ?>
@@ -111,7 +111,7 @@ include 'header.php';
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-hover" id="certificationsTable">
+                <table class="table table-striped table-hover data-table">
                     <thead class="table-dark">
                         <tr>
                             <th>ID</th>
@@ -214,25 +214,3 @@ include 'header.php';
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize DataTables if available
-        if (typeof $ !== 'undefined' && $.fn.DataTable) {
-            $('#certificationsTable').DataTable({
-                "order": [[0, "desc"]], // Sort by ID descending (newest first)
-                "pageLength": 25,
-                "language": {
-                    "search": "Search certifications:",
-                    "lengthMenu": "Show _MENU_ certifications per page",
-                    "zeroRecords": "No certifications found",
-                    "info": "Showing _START_ to _END_ of _TOTAL_ certifications",
-                    "infoEmpty": "No certifications available",
-                    "infoFiltered": "(filtered from _MAX_ total certifications)"
-                }
-            });
-        }
-    });
-</script>
-
-<?php include 'footer.php'; ?>
