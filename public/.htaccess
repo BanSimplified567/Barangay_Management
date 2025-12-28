@@ -1,0 +1,9 @@
+# public/.htaccess
+RewriteEngine On
+
+# Let real files pass through
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# All other requests -> public/index.php
+RewriteRule ^ index.php [L]

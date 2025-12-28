@@ -1,6 +1,22 @@
+# Database dumps
 db_management.sql
-.htaccess
-public
-app/controllers
-public/.htaccess
-backups
+
+# Apache sensitive config
+# Only ignore if it has sensitive info, otherwise commit
+# .htaccess
+
+# Ignore only generated files in public, not the folder itself
+public/uploads/
+public/cache/
+
+# Ignore backups
+backups/
+
+# Ignore Folder
+/app/controllers/
+
+# Ignore OS/IDE files
+*.DS_Store
+*.log
+.idea/
+.vscode/
