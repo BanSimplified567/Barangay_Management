@@ -5,16 +5,41 @@
 // Get data from controller
 $tables = $tables ?? [];
 $dbInfo = $dbInfo ?? ['total_size' => 0, 'table_count' => 0];
+$pdo = $pdo ?? null; // Get PDO instance from controller
+$mysqlVersion = $mysqlVersion ?? 'Unknown';
+$dbName = $dbName ?? 'Unknown';
+$characterSet = $characterSet ?? 'UTF8';
+$collation = $collation ?? 'utf8_general_ci';
+$queryCacheSize = $queryCacheSize ?? 0;
+$maxConnections = $maxConnections ?? 'Unknown';
+$uptime = $uptime ?? 0;
 
 // Helper function to format bytes
 function formatBytes($bytes, $decimals = 2)
 {
-  if ($bytes === 0) return '0 Bytes';
+  if ($bytes === 0 || $bytes === null) return '0 Bytes';
   $k = 1024;
   $dm = $decimals < 0 ? 0 : $decimals;
   $sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   $i = floor(log($bytes) / log($k));
   return number_format($bytes / pow($k, $i), $dm) . ' ' . $sizes[$i];
+}
+
+// Helper function to format uptime
+function formatUptime($seconds)
+{
+  if ($seconds <= 0) return 'Unknown';
+
+  $days = floor($seconds / 86400);
+  $hours = floor(($seconds % 86400) / 3600);
+  $minutes = floor(($seconds % 3600) / 60);
+
+  $parts = [];
+  if ($days > 0) $parts[] = $days . ' day' . ($days > 1 ? 's' : '');
+  if ($hours > 0) $parts[] = $hours . ' hour' . ($hours > 1 ? 's' : '');
+  if ($minutes > 0) $parts[] = $minutes . ' minute' . ($minutes > 1 ? 's' : '');
+
+  return implode(', ', $parts) ?: 'Less than a minute';
 }
 ?>
 
@@ -24,49 +49,44 @@ function formatBytes($bytes, $decimals = 2)
   <!-- Success/Error Messages -->
   <?php if (isset($_SESSION['success'])): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-      <?php echo $_SESSION['success'];
-      unset($_SESSION['success']); ?>
+      <?php echo htmlspecialchars($_SESSION['success']); ?>
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+    <?php unset($_SESSION['success']); ?>
   <?php endif; ?>
 
   <?php if (isset($_SESSION['error'])): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      <?php echo $_SESSION['error'];
-      unset($_SESSION['error']); ?>
+      <?php echo htmlspecialchars($_SESSION['error']); ?>
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+    <?php unset($_SESSION['error']); ?>
   <?php endif; ?>
 
   <div class="row">
+    <!-- Settings Sidebar -->
     <div class="col-lg-3 mb-4">
       <div class="card shadow">
         <div class="card-header py-3">
           <h6 class="m-0 font-weight-bold text-primary">Settings Categories</h6>
         </div>
         <div class="list-group list-group-flush">
-          <a href="index.php?action=settings"
-            class="list-group-item list-group-item-action">
+          <a href="index.php?action=settings" class="list-group-item list-group-item-action">
             <i class="bi bi-gear me-2"></i>General Settings
           </a>
-          <a href="index.php?action=settings&sub=system"
-            class="list-group-item list-group-item-action">
+          <a href="index.php?action=settings&sub=system" class="list-group-item list-group-item-action">
             <i class="bi bi-display me-2"></i>System Settings
           </a>
-          <a href="index.php?action=settings&sub=email"
-            class="list-group-item list-group-item-action">
+          <a href="index.php?action=settings&sub=email" class="list-group-item list-group-item-action">
             <i class="bi bi-envelope me-2"></i>Email Settings
           </a>
-          <a href="index.php?action=settings&sub=security"
-            class="list-group-item list-group-item-action">
+          <a href="index.php?action=settings&sub=security" class="list-group-item list-group-item-action">
             <i class="bi bi-shield-lock me-2"></i>Security Settings
           </a>
-          <a href="index.php?action=settings&sub=backup"
-            class="list-group-item list-group-item-action">
+          <a href="index.php?action=settings&sub=backup" class="list-group-item list-group-item-action">
             <i class="bi bi-hdd me-2"></i>Backup Settings
           </a>
-          <a href="index.php?action=settings&sub=database"
-            class="list-group-item list-group-item-action active">
+          <a href="index.php?action=settings&sub=database" class="list-group-item list-group-item-action active">
             <i class="bi bi-database me-2"></i>Database Info
           </a>
         </div>
@@ -86,7 +106,7 @@ function formatBytes($bytes, $decimals = 2)
                     Total Tables
                   </div>
                   <div class="h5 mb-0 font-weight-bold text-gray-800">
-                    <?php echo $dbInfo['table_count'] ?? 0; ?>
+                    <?php echo htmlspecialchars($dbInfo['table_count'] ?? 0); ?>
                   </div>
                 </div>
                 <div class="col-auto">
@@ -152,14 +172,7 @@ function formatBytes($bytes, $decimals = 2)
                     MySQL Version
                   </div>
                   <div class="h5 mb-0 font-weight-bold text-gray-800">
-                    <?php
-                    try {
-                      $version = $pdo->query('SELECT VERSION()')->fetchColumn();
-                      echo explode('-', $version)[0];
-                    } catch (Exception $e) {
-                      echo 'Unknown';
-                    }
-                    ?>
+                    <?php echo htmlspecialchars($mysqlVersion); ?>
                   </div>
                 </div>
                 <div class="col-auto">
@@ -206,10 +219,11 @@ function formatBytes($bytes, $decimals = 2)
                     $dataSize = $table['DATA_LENGTH'] ?? 0;
                     $indexSize = $table['INDEX_LENGTH'] ?? 0;
                     $totalSize = $dataSize + $indexSize;
+                    $tableName = htmlspecialchars($table['TABLE_NAME']);
                     ?>
                     <tr>
                       <td>
-                        <strong><?php echo htmlspecialchars($table['TABLE_NAME']); ?></strong>
+                        <strong><?php echo $tableName; ?></strong>
                       </td>
                       <td><?php echo number_format($table['TABLE_ROWS'] ?? 0); ?></td>
                       <td><?php echo formatBytes($dataSize); ?></td>
@@ -219,18 +233,34 @@ function formatBytes($bytes, $decimals = 2)
                           <?php echo formatBytes($totalSize); ?>
                         </span>
                       </td>
-                      <td><?php echo !empty($table['CREATE_TIME']) ? date('Y-m-d', strtotime($table['CREATE_TIME'])) : 'N/A'; ?></td>
-                      <td><?php echo !empty($table['UPDATE_TIME']) ? date('Y-m-d', strtotime($table['UPDATE_TIME'])) : 'N/A'; ?></td>
                       <td>
-                        <button class="btn btn-sm btn-info" onclick="optimizeTable('<?php echo htmlspecialchars($table['TABLE_NAME']); ?>')"
+                        <?php
+                        if (!empty($table['CREATE_TIME']) && $table['CREATE_TIME'] !== 'NULL') {
+                          echo htmlspecialchars(date('Y-m-d', strtotime($table['CREATE_TIME'])));
+                        } else {
+                          echo 'N/A';
+                        }
+                        ?>
+                      </td>
+                      <td>
+                        <?php
+                        if (!empty($table['UPDATE_TIME']) && $table['UPDATE_TIME'] !== 'NULL') {
+                          echo htmlspecialchars(date('Y-m-d', strtotime($table['UPDATE_TIME'])));
+                        } else {
+                          echo 'N/A';
+                        }
+                        ?>
+                      </td>
+                      <td>
+                        <button class="btn btn-sm btn-info" onclick="optimizeTable('<?php echo $tableName; ?>')"
                           title="Optimize Table">
                           <i class="bi bi-arrow-clockwise"></i>
                         </button>
-                        <button class="btn btn-sm btn-warning" onclick="repairTable('<?php echo htmlspecialchars($table['TABLE_NAME']); ?>')"
+                        <button class="btn btn-sm btn-warning" onclick="repairTable('<?php echo $tableName; ?>')"
                           title="Repair Table">
                           <i class="bi bi-tools"></i>
                         </button>
-                        <button class="btn btn-sm btn-secondary" onclick="showTableInfo('<?php echo htmlspecialchars($table['TABLE_NAME']); ?>')"
+                        <button class="btn btn-sm btn-secondary" onclick="showTableInfo('<?php echo $tableName; ?>')"
                           title="Table Info">
                           <i class="bi bi-info-circle"></i>
                         </button>
@@ -293,39 +323,15 @@ function formatBytes($bytes, $decimals = 2)
               <table class="table table-sm">
                 <tr>
                   <th>Database Name</th>
-                  <td>
-                    <?php
-                    try {
-                      echo htmlspecialchars($pdo->query('SELECT DATABASE()')->fetchColumn());
-                    } catch (Exception $e) {
-                      echo 'Unknown';
-                    }
-                    ?>
-                  </td>
+                  <td><?php echo htmlspecialchars($dbName); ?></td>
                 </tr>
                 <tr>
                   <th>Character Set</th>
-                  <td>
-                    <?php
-                    try {
-                      echo htmlspecialchars($pdo->query("SHOW VARIABLES LIKE 'character_set_database'")->fetch(PDO::FETCH_ASSOC)['Value'] ?? 'UTF8');
-                    } catch (Exception $e) {
-                      echo 'UTF8';
-                    }
-                    ?>
-                  </td>
+                  <td><?php echo htmlspecialchars($characterSet); ?></td>
                 </tr>
                 <tr>
                   <th>Collation</th>
-                  <td>
-                    <?php
-                    try {
-                      echo htmlspecialchars($pdo->query("SHOW VARIABLES LIKE 'collation_database'")->fetch(PDO::FETCH_ASSOC)['Value'] ?? 'utf8_general_ci');
-                    } catch (Exception $e) {
-                      echo 'utf8_general_ci';
-                    }
-                    ?>
-                  </td>
+                  <td><?php echo htmlspecialchars($collation); ?></td>
                 </tr>
               </table>
             </div>
@@ -334,42 +340,15 @@ function formatBytes($bytes, $decimals = 2)
               <table class="table table-sm">
                 <tr>
                   <th>Query Cache</th>
-                  <td>
-                    <?php
-                    try {
-                      $qc = $pdo->query("SHOW VARIABLES LIKE 'query_cache_size'")->fetch(PDO::FETCH_ASSOC);
-                      echo formatBytes($qc['Value'] ?? 0);
-                    } catch (Exception $e) {
-                      echo 'Not available';
-                    }
-                    ?>
-                  </td>
+                  <td><?php echo formatBytes($queryCacheSize); ?></td>
                 </tr>
                 <tr>
                   <th>Max Connections</th>
-                  <td>
-                    <?php
-                    try {
-                      $mc = $pdo->query("SHOW VARIABLES LIKE 'max_connections'")->fetch(PDO::FETCH_ASSOC);
-                      echo $mc['Value'] ?? 'Unknown';
-                    } catch (Exception $e) {
-                      echo 'Unknown';
-                    }
-                    ?>
-                  </td>
+                  <td><?php echo htmlspecialchars($maxConnections); ?></td>
                 </tr>
                 <tr>
                   <th>Uptime</th>
-                  <td>
-                    <?php
-                    try {
-                      $uptime = $pdo->query("SHOW GLOBAL STATUS LIKE 'Uptime'")->fetch(PDO::FETCH_ASSOC);
-                      echo formatUptime($uptime['Value'] ?? 0);
-                    } catch (Exception $e) {
-                      echo 'Unknown';
-                    }
-                    ?>
-                  </td>
+                  <td><?php echo formatUptime($uptime); ?></td>
                 </tr>
               </table>
             </div>
@@ -414,22 +393,3 @@ function formatBytes($bytes, $decimals = 2)
     alert('Table structure for: ' + tableName + ' would be displayed here.');
   }
 </script>
-
-<?php
-// Helper function to format uptime
-if (!function_exists('formatUptime')) {
-  function formatUptime($seconds)
-  {
-    $days = floor($seconds / 86400);
-    $hours = floor(($seconds % 86400) / 3600);
-    $minutes = floor(($seconds % 3600) / 60);
-
-    $parts = [];
-    if ($days > 0) $parts[] = $days . ' day' . ($days > 1 ? 's' : '');
-    if ($hours > 0) $parts[] = $hours . ' hour' . ($hours > 1 ? 's' : '');
-    if ($minutes > 0) $parts[] = $minutes . ' minute' . ($minutes > 1 ? 's' : '');
-
-    return implode(', ', $parts);
-  }
-}
-?>
