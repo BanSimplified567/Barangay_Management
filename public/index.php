@@ -26,6 +26,20 @@ switch ($action) {
     $controller->index();
     break;
 
+  case 'forgot-password':
+    guest_only();
+    require_once '../app/controllers/Auth/ForgotController.php';
+    $controller = new ForgotController($pdo);
+    $controller->index();
+    break;
+    
+    case 'reset-password':
+      guest_only();
+      require_once '../app/controllers/Auth/ResetPasswordController.php';
+      $controller = new ResetPasswordController($pdo);
+      $controller->index();
+      break;
+
   case 'logout':
     require_once '../app/controllers/Auth/LogoutController.php';
     $controller = new LogoutController($pdo);
@@ -185,37 +199,37 @@ switch ($action) {
     }
     break;
 
-    case 'announcements':
-      authorize(['admin', 'staff']);
-      require_once '../app/controllers/AnnouncementController.php';
-      $controller = new AnnouncementController($pdo);
+  case 'announcements':
+    authorize(['admin', 'staff']);
+    require_once '../app/controllers/AnnouncementController.php';
+    $controller = new AnnouncementController($pdo);
 
-      // Handle sub-actions
-      $sub = $_GET['sub'] ?? 'list';
-      switch ($sub) {
-        case 'add':
-          $controller->index();
-          break;
-        case 'edit':
-          $controller->index();
-          break;
-        case 'delete':
-          $controller->index();
-          break;
-        case 'create':
-          $controller->index();
-          break;
-        case 'update':
-          $controller->index();
-          break;
-        case 'view':
-          $controller->index();
-          break;
-        default:
-          $controller->index();
-          break;
-      }
-      break;
+    // Handle sub-actions
+    $sub = $_GET['sub'] ?? 'list';
+    switch ($sub) {
+      case 'add':
+        $controller->index();
+        break;
+      case 'edit':
+        $controller->index();
+        break;
+      case 'delete':
+        $controller->index();
+        break;
+      case 'create':
+        $controller->index();
+        break;
+      case 'update':
+        $controller->index();
+        break;
+      case 'view':
+        $controller->index();
+        break;
+      default:
+        $controller->index();
+        break;
+    }
+    break;
   case 'logs':
     authorize(['admin', 'staff']);
     require_once '../app/controllers/LogController.php';
