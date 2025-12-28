@@ -1,6 +1,5 @@
 db_management.sql
 .htaccess
 public
-app/controllers
 public/.htaccess
 backups
