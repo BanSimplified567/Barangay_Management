@@ -95,7 +95,7 @@ $role = $_SESSION['role'] ?? 'guest';
                 </a>
               </li>
             <?php endif; ?>
-            <?php if (in_array($role, ['resident', 'admin', 'staff'])): ?>
+            <?php if (in_array($role, ['admin', 'staff'])): ?>
               <li>
                 <a href="index.php?action=my_profile" class="nav-link px-0 align-middle">
                   <i class="fs-4 bi-person-circle"></i>

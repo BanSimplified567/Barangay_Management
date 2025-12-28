@@ -27,29 +27,30 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      min-height: 90vh;
       margin: 0;
-      padding: 20px;
+      padding: 15px;
+      font-size: 14px;
     }
 
     .login-grid-container {
-      max-width: 1100px;
+      max-width: 800px;
       width: 100%;
       background-color: white;
-      border-radius: 20px;
-      box-shadow: 0 15px 35px rgba(0, 56, 147, 0.15);
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 56, 147, 0.12);
       overflow: hidden;
       animation: fadeInUp 0.6s ease-out;
-      border: 1px solid rgba(0, 56, 147, 0.1);
+      border: 1px solid rgba(0, 56, 147, 0.08);
       display: grid;
       grid-template-columns: 1fr 1fr;
-      min-height: 700px;
+      min-height: 550px;
     }
 
     @keyframes fadeInUp {
       from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(20px);
       }
 
       to {
@@ -62,7 +63,7 @@
     .login-welcome {
       background: linear-gradient(135deg, var(--ph-blue) 0%, var(--ph-dark-blue) 100%);
       color: white;
-      padding: 50px 40px;
+      padding: 35px 30px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -80,27 +81,27 @@
       width: 200%;
       height: 200%;
       background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-      background-size: 20px 20px;
-      opacity: 0.1;
+      background-size: 18px 18px;
+      opacity: 0.08;
     }
 
     .welcome-logo-container {
       position: relative;
-      width: 140px;
-      height: 140px;
-      margin-bottom: 40px;
+      width: 100px;
+      height: 100px;
+      margin-bottom: 25px;
       background: rgba(255, 255, 255, 0.95);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      border: 5px solid var(--ph-yellow);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      border: 4px solid var(--ph-yellow);
       z-index: 1;
     }
 
     .welcome-logo-container img {
-      width: 80%;
+      width: 75%;
       height: auto;
       border-radius: 50%;
       object-fit: cover;
@@ -112,48 +113,48 @@
     }
 
     .welcome-title {
-      font-size: 2.2rem;
+      font-size: 1.6rem;
       font-weight: 700;
-      margin-bottom: 15px;
-      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+      letter-spacing: 0.3px;
     }
 
     .barangay-name-large {
-      font-size: 1.6rem;
+      font-size: 1.2rem;
       opacity: 0.95;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       font-weight: 400;
     }
 
     .welcome-features {
-      margin-top: 50px;
+      margin-top: 35px;
       text-align: left;
       width: 100%;
-      max-width: 350px;
+      max-width: 300px;
     }
 
     .feature-item {
       display: flex;
       align-items: center;
-      margin-bottom: 25px;
-      padding: 15px 20px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: transform 0.3s ease;
+      margin-bottom: 18px;
+      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: transform 0.2s ease;
     }
 
     .feature-item:hover {
-      transform: translateX(5px);
-      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(3px);
+      background: rgba(255, 255, 255, 0.12);
     }
 
     .feature-icon {
-      font-size: 1.8rem;
+      font-size: 1.4rem;
       color: var(--ph-yellow);
-      margin-right: 20px;
-      width: 50px;
+      margin-right: 15px;
+      width: 40px;
       text-align: center;
     }
 
@@ -163,19 +164,19 @@
 
     .feature-title {
       font-weight: 600;
-      margin-bottom: 5px;
-      font-size: 1.1rem;
+      margin-bottom: 4px;
+      font-size: 0.95rem;
     }
 
     .feature-desc {
-      opacity: 0.9;
-      font-size: 0.9rem;
-      line-height: 1.4;
+      opacity: 0.85;
+      font-size: 0.8rem;
+      line-height: 1.3;
     }
 
     /* Right Side - Login Form */
     .login-form-container {
-      padding: 60px 50px;
+      padding: 40px 35px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -184,64 +185,67 @@
 
     .form-header {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
 
     .form-title {
-      font-size: 2rem;
+      font-size: 1.6rem;
       color: var(--ph-dark-blue);
       font-weight: 700;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .form-subtitle {
       color: #666;
-      font-size: 1rem;
+      font-size: 0.9rem;
     }
 
     .alert {
-      border-radius: 10px;
+      border-radius: 8px;
       border: none;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      margin-bottom: 25px;
+      box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
+      margin-bottom: 20px;
+      padding: 12px 15px;
+      font-size: 0.85rem;
     }
 
     .alert-danger {
       background-color: #ffe6e9;
       color: #b00020;
-      border-left: 4px solid var(--ph-red);
+      border-left: 3px solid var(--ph-red);
     }
 
     .alert-success {
       background-color: #e8f7ef;
       color: #006442;
-      border-left: 4px solid #28a745;
+      border-left: 3px solid #28a745;
     }
 
     .form-label {
       color: var(--ph-dark-blue);
       font-weight: 600;
-      margin-bottom: 8px;
-      font-size: 0.95rem;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
     }
 
     .input-group {
-      box-shadow: 0 3px 6px rgba(0, 56, 147, 0.05);
-      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 56, 147, 0.04);
+      border-radius: 8px;
       overflow: hidden;
-      border: 2px solid #e0e6f0;
-      transition: all 0.3s ease;
+      border: 1.5px solid #e0e6f0;
+      transition: all 0.25s ease;
     }
 
     .input-group:focus-within {
       border-color: var(--ph-blue);
-      box-shadow: 0 0 0 0.25rem rgba(0, 56, 147, 0.15);
+      box-shadow: 0 0 0 0.2rem rgba(0, 56, 147, 0.1);
     }
 
     .form-control {
       border: none;
-      padding: 14px 15px;
-      font-size: 1rem;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      height: 40px;
     }
 
     .form-control:focus {
@@ -251,39 +255,41 @@
     .input-group-text {
       background-color: white;
       border: none;
-      padding: 0 15px;
+      padding: 0 12px;
       cursor: pointer;
       color: var(--ph-blue);
+      font-size: 0.9rem;
     }
 
     .btn-login {
       background: linear-gradient(135deg, var(--ph-blue) 0%, var(--ph-dark-blue) 100%);
       color: white;
       width: 100%;
-      padding: 15px;
+      padding: 12px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       font-weight: 600;
-      font-size: 1.1rem;
-      transition: all 0.3s ease;
-      margin-top: 10px;
-      box-shadow: 0 5px 15px rgba(0, 56, 147, 0.2);
-      letter-spacing: 0.5px;
+      font-size: 0.95rem;
+      transition: all 0.25s ease;
+      margin-top: 8px;
+      box-shadow: 0 4px 10px rgba(0, 56, 147, 0.15);
+      letter-spacing: 0.3px;
+      height: 44px;
     }
 
     .btn-login:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0, 56, 147, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 56, 147, 0.25);
     }
 
     .btn-login:active {
-      transform: translateY(-1px);
+      transform: translateY(0);
     }
 
     .login-footer {
       text-align: center;
-      margin-top: 30px;
-      padding-top: 25px;
+      margin-top: 25px;
+      padding-top: 20px;
       border-top: 1px solid #eaeff5;
     }
 
@@ -294,7 +300,8 @@
       transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
+      font-size: 0.85rem;
     }
 
     .login-footer a:hover {
@@ -303,12 +310,13 @@
     }
 
     .login-footer p {
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       color: #666;
+      font-size: 0.8rem;
     }
 
     .form-check {
-      margin-top: 15px;
+      margin-top: 12px;
     }
 
     .form-check-input:checked {
@@ -318,68 +326,87 @@
 
     .form-check-label {
       color: #555;
+      font-size: 0.85rem;
     }
 
     .input-icon {
       color: var(--ph-blue);
-      width: 50px;
+      width: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
       background-color: #f8fafd;
       border-right: 1px solid #e0e6f0;
+      font-size: 0.9rem;
     }
 
     /* Responsive adjustments */
     @media (max-width: 992px) {
       .login-grid-container {
         grid-template-columns: 1fr;
-        max-width: 600px;
+        max-width: 500px;
         min-height: auto;
       }
 
       .login-welcome {
-        padding: 40px 30px;
+        padding: 30px 25px;
       }
 
       .welcome-title {
-        font-size: 1.8rem;
-      }
-
-      .login-form-container {
-        padding: 40px 35px;
-      }
-    }
-
-    @media (max-width: 576px) {
-      .login-grid-container {
-        border-radius: 15px;
-      }
-
-      .login-welcome {
-        padding: 30px 20px;
-      }
-
-      .welcome-logo-container {
-        width: 120px;
-        height: 120px;
-        margin-bottom: 30px;
-      }
-
-      .welcome-title {
-        font-size: 1.6rem;
+        font-size: 1.4rem;
       }
 
       .login-form-container {
         padding: 30px 25px;
       }
 
+      body {
+        padding: 12px;
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .login-grid-container {
+        border-radius: 12px;
+        max-width: 100%;
+      }
+
+      .login-welcome {
+        padding: 25px 20px;
+      }
+
+      .welcome-logo-container {
+        width: 85px;
+        height: 85px;
+        margin-bottom: 20px;
+      }
+
+      .welcome-title {
+        font-size: 1.3rem;
+      }
+
+      .login-form-container {
+        padding: 25px 20px;
+      }
+
       .form-title {
-        font-size: 1.6rem;
+        font-size: 1.3rem;
       }
 
       body {
-        padding: 15px;
+        padding: 10px;
+      }
+
+      .form-control {
+        padding: 8px 10px;
+        height: 38px;
+      }
+
+      .btn-login {
+        padding: 10px;
+        height: 40px;
+        font-size: 0.9rem;
       }
     }
 
@@ -390,11 +417,11 @@
 
     @keyframes pulse {
       0% {
-        box-shadow: 0 0 0 0 rgba(0, 56, 147, 0.2);
+        box-shadow: 0 0 0 0 rgba(0, 56, 147, 0.15);
       }
 
       70% {
-        box-shadow: 0 0 0 10px rgba(0, 56, 147, 0);
+        box-shadow: 0 0 0 8px rgba(0, 56, 147, 0);
       }
 
       100% {
@@ -411,7 +438,7 @@
       }
 
       50% {
-        transform: translateY(-5px);
+        transform: translateY(-3px);
       }
     }
 
@@ -550,7 +577,7 @@
           <a href="index.php?action=forgot-password">
             <i class="bi bi-key-fill me-1"></i>Forgot Password?
           </a>
-  
+
         </p>
       </div>
     </div>
