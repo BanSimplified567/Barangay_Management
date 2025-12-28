@@ -99,7 +99,7 @@ class DashboardController extends BaseController
                 FROM tbl_logs l
                 JOIN tbl_users u ON l.user_id = u.id
                 ORDER BY l.timestamp DESC
-                LIMIT 10
+                LIMIT 2
             ")->fetchAll(PDO::FETCH_ASSOC);
 
       // 8. RECENT ANNOUNCEMENTS - Your table doesn't have 'status' column

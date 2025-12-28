@@ -20,9 +20,19 @@ $role = $_SESSION['role'] ?? 'guest';
       <div class="bg-light col-auto col-md-3 col-xl-2 px-sm-2 px-0">
         <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 min-vh-100">
           <!-- Brand -->
-          <a href="index.php?action=dashboard" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-decoration-none">
-            <span class="fs-5 d-none d-sm-inline">Barangay System</span>
+          <a href="index.php?action=dashboard"
+            class="d-flex align-items-center gap-2 pb-2 mb-md-0 me-md-auto text-decoration-none">
+
+            <img src="../assets/Sibonga.jpg"
+              alt="Sibonga Barangay Seal"
+              class="img-fluid"
+              style="width: 32px; height: 32px; object-fit: cover;">
+
+            <span class="small fw-semibold d-none d-sm-inline">
+              Barangay Bansimplified
+            </span>
           </a>
+
           <!-- Navigation -->
           <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
             <li class="nav-item">

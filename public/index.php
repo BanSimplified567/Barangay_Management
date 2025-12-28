@@ -8,8 +8,20 @@ define('BASE_PATH', dirname(__DIR__));
 require_once '../config/dbcon.php';                 // Database connection
 require_once '../app/middleware/auth.php';         // Authentication middleware
 
-// Determine the action from URL (e.g., index.php?action=officials)
 $action = $_GET['action'] ?? 'dashboard';
+
+
+// If no action requested, force the canonical public login URL
+if (!isset($_GET['action'])) {
+  // build absolute URL to avoid relative-path mistakes
+  $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+  $host   = $_SERVER['HTTP_HOST'];                // e.g. localhost:80
+  $base   = '/Barangay_Management';               // <--- set your project folder here
+
+  header("Location: {$scheme}://{$host}{$base}/public/index.php?action=login");
+  exit;
+}
+
 
 switch ($action) {
   case 'login':
@@ -32,13 +44,13 @@ switch ($action) {
     $controller = new ForgotController($pdo);
     $controller->index();
     break;
-    
-    case 'reset-password':
-      guest_only();
-      require_once '../app/controllers/Auth/ResetPasswordController.php';
-      $controller = new ResetPasswordController($pdo);
-      $controller->index();
-      break;
+
+  case 'reset-password':
+    guest_only();
+    require_once '../app/controllers/Auth/ResetPasswordController.php';
+    $controller = new ResetPasswordController($pdo);
+    $controller->index();
+    break;
 
   case 'logout':
     require_once '../app/controllers/Auth/LogoutController.php';

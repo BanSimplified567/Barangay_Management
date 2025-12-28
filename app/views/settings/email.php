@@ -136,7 +136,7 @@ $settings = $settings ?? [];
                 <div class="mb-3">
                   <label for="email_sender_name" class="form-label">Sender Name</label>
                   <input type="text" class="form-control" id="email_sender_name" name="settings[email_sender_name]"
-                    value="<?php echo htmlspecialchars($settings['email_sender_name'] ?? $settings['system_name'] ?? 'Barangay System'); ?>">
+                    value="<?php echo htmlspecialchars($settings['email_sender_name'] ?? $settings['system_name'] ?? 'Barangay Bansimplified'); ?>">
                   <div class="form-text">Display name for email sender</div>
                 </div>
               </div>
