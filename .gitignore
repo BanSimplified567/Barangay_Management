@@ -10,7 +10,7 @@ public/uploads/
 public/cache/
 
 # Ignore backups
-backups/
+backups
 
 # Ignore Folder
 /app/controllers/
